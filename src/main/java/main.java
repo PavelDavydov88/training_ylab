@@ -7,15 +7,15 @@ import java.util.Scanner;
 public class main {
     public static void main(String[] args) {
 
-        AuthRepository authRepository = new AuthRepositoryImpl();
         PlayerRepository playerRepository = new PlayerRepositoryImpl();
+        AuthRepository authRepository = new AuthRepositoryImpl();
+        TransactionRepository transactionRepository = new TransactionRepositoryImpl();
         HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl();
         AuditRepository auditRepository = new AuditRepositoryImpl();
-        TransactionRepository transactionRepository = new TransactionRepositoryImpl();
 
+        AuthService authService = new AuthServiceImpl(playerRepository,authRepository, auditRepository);
         TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
-        PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authRepository, historyCreditDebitRepository, auditRepository);
-        AuthService authService = new AuthServiceImpl(playerService, authRepository, auditRepository);
+        PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditRepository);
 
         Scanner input = new Scanner(System.in);
         int option;
@@ -30,7 +30,7 @@ public class main {
                     System.out.println("registration player, input Name, Password");
                     String name = input.next();
                     String password = input.next();
-                    Player player = playerService.create(new Player(name, password, 0));
+                    Player player = playerService.create(name, password);
                     System.out.println("player created : " + player);
                     break;
                 }

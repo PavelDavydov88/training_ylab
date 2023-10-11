@@ -12,13 +12,9 @@ public interface PlayerService {
 
     long creditAccount(String token, long valueCreditAccount, String transaction) throws Exception;
 
-    Player create(Player player);
+    Player create(String name, String password);
 
     List<String> getListOperationAccount(String token);
-
-    Player findByNamePassword(String name, String password);
-
-    Player findByToken(String token);
 
     List<String> getListAuditAction(String token);
 }

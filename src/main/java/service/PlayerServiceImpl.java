@@ -1,14 +1,10 @@
 package service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import model.Player;
 import repository.AuditRepository;
-import repository.AuthRepository;
 import repository.HistoryCreditDebitRepository;
 import repository.PlayerRepository;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.List;
 
 /**
@@ -18,19 +14,19 @@ public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerRepository playerRepository;
     private final TransactionService transactionService;
-    private final AuthRepository authRepository;
+    private final AuthService authService;
     private final HistoryCreditDebitRepository historyCreditDebitRepository;
     private final AuditRepository auditRepository;
 
     public PlayerServiceImpl(
             PlayerRepository playerRepository,
             TransactionService transactionService,
-            AuthRepository authRepository,
+            AuthService authService,
             HistoryCreditDebitRepository historyCreditDebitRepository,
             AuditRepository auditRepository) {
         this.playerRepository = playerRepository;
         this.transactionService = transactionService;
-        this.authRepository = authRepository;
+        this.authService = authService;
         this.historyCreditDebitRepository = historyCreditDebitRepository;
         this.auditRepository = auditRepository;
     }
@@ -42,11 +38,11 @@ public class PlayerServiceImpl implements PlayerService {
      */
     @Override
     public long getAccount(String token) {
-        if (authRepository.find(token) == null) {
+        if (authService.find(token) == null) {
             System.out.println("invalid token");
             return 0;
         }
-        int id = Integer.parseInt(decodeJWT(token).getId());
+        int id = Integer.parseInt(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
         auditRepository.save(player.getId(), "getting account");
         return player.getAccount();
@@ -63,11 +59,11 @@ public class PlayerServiceImpl implements PlayerService {
      */
     @Override
     public long debitAccount(String token, long valueDebitAccount, String transaction) throws Exception {
-        if (authRepository.find(token) == null) {
+        if (authService.find(token) == null) {
             System.out.println("invalid token");
             return 0;
         }
-        int id = Integer.parseInt(decodeJWT(token).getId());
+        int id = Integer.parseInt(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
 
         if (transactionService.checkExist(transaction)) {
@@ -97,11 +93,11 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public long creditAccount(String token, long valueCreditAccount, String transaction) throws Exception {
 
-        if (authRepository.find(token) == null) {
+        if (authService.find(token) == null) {
             System.out.println("invalid token");
             return 0;
         }
-        int id = Integer.parseInt(decodeJWT(token).getId());
+        int id = Integer.parseInt(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
         if (transactionService.checkExist(transaction)) {
             auditRepository.save(player.getId(), "credit operation have not been done, this transaction is exist");
@@ -117,11 +113,13 @@ public class PlayerServiceImpl implements PlayerService {
 
     /**
      * метод создания игрока
-     * @param inputPlayer входные данные для создания игрока (имя, пароль)
+     * @param name имя
+     * @param password пароль
      * @return новый игрок
      */
     @Override
-    public Player create(Player inputPlayer) {
+    public Player create(String name, String password) {
+        Player inputPlayer = new Player(name, password, 0);
         Player player = playerRepository.save(inputPlayer);
         auditRepository.save(player.getId(), "registration completed successful");
         return player;
@@ -134,24 +132,13 @@ public class PlayerServiceImpl implements PlayerService {
      */
     @Override
     public List<String> getListOperationAccount(String token) {
-        if (authRepository.find(token) == null) {
+        if (authService.find(token) == null) {
             System.out.println("invalid token");
             return null;
         }
-        int id = Integer.parseInt(decodeJWT(token).getId());
+        int id = Integer.parseInt(authService.decodeJWT(token).getId());
         auditRepository.save(id, "operation request history of credit/debit operations");
         return historyCreditDebitRepository.findById(id);
-    }
-
-    /**
-     * метод для получениия из репозитория игрока по имени и паролю
-     * @param name имя игрока
-     * @param password пароль игрока
-     * @return возращает игрока
-     */
-    @Override
-    public Player findByNamePassword(String name, String password) {
-        return playerRepository.findByNamePassword(name, password);
     }
 
     /**
@@ -161,36 +148,12 @@ public class PlayerServiceImpl implements PlayerService {
      */
     @Override
     public List<String> getListAuditAction(String token) {
-        if (authRepository.find(token) == null) {
+        if (authService.find(token) == null) {
             System.out.println("invalid token");
             return null;
         }
-        int id = Integer.parseInt(decodeJWT(token).getId());
+        int id = Integer.parseInt(authService.decodeJWT(token).getId());
         return auditRepository.findById(id);
-    }
-
-    /**
-     * метод для получениия из репозитория игрока по токену
-     * @param token токен игрока
-     * @return возращает игрока
-     */
-    @Override
-    public Player findByToken(String token) {
-        int id = Integer.parseInt(decodeJWT(token).getId());
-        return playerRepository.findById(id);
-    }
-
-    /**
-     * метод декодинга токена
-     * @param jwt токен
-     * @return расшифрованный токен
-     */
-    public static Claims decodeJWT(String jwt) {
-        //This line will throw an exception if it is not a signed JWS (as expected)
-        Claims claims = Jwts.parser()
-                .setSigningKey(DatatypeConverter.parseBase64Binary("SECRET_KEY"))
-                .parseClaimsJws(jwt).getBody();
-        return claims;
     }
 
 }

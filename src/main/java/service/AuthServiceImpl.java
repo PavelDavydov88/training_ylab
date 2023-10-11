@@ -1,11 +1,13 @@
 package service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import model.Player;
 import repository.AuditRepository;
 import repository.AuthRepository;
+import repository.PlayerRepository;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
@@ -17,12 +19,12 @@ import java.util.Date;
  */
 public class AuthServiceImpl implements AuthService {
 
-    private final PlayerService playerService;
+    private final PlayerRepository playerRepository;
     private final AuthRepository authRepository;
     private final AuditRepository auditRepository;
 
-    public AuthServiceImpl(PlayerService playerService, AuthRepository authRepository, AuditRepository auditRepository) {
-        this.playerService = playerService;
+    public AuthServiceImpl(PlayerRepository playerRepository, AuthRepository authRepository, AuditRepository auditRepository) {
+        this.playerRepository = playerRepository;
         this.authRepository = authRepository;
         this.auditRepository = auditRepository;
     }
@@ -36,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String doAuthorization(String name, String password) {
 
-        Player player = playerService.findByNamePassword(name, password);
+        Player player = playerRepository.findByNamePassword(name, password);
 
         if (player == null) {
             return "this player doesn't exist";
@@ -54,7 +56,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void exitAuthorization(String token) {
-        Player player = playerService.findByToken(token);
+        int idPlayer = Integer.parseInt(decodeJWT(token).getId());
+        Player player = playerRepository.findById(idPlayer);
         auditRepository.save(player.getId(), "exit of authorization player done");
         authRepository.delete(token);
     }
@@ -65,36 +68,49 @@ public class AuthServiceImpl implements AuthService {
      * @param issuer эмитент токена
      * @param subject тело токена
      * @param ttlMillis время
-     * @return
+     * @return новый токен
      */
-    private static String createJWT(String id, String issuer, String subject, long ttlMillis) {
-
-        //The JWT signature algorithm we will be using to sign the token
+    @Override
+    public String createJWT(String id, String issuer, String subject, long ttlMillis) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-
-        //We will sign our JWT with our ApiKey secret
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary("SECRET_KEY");
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-
-        //Let's set the JWT Claims
         JwtBuilder builder = Jwts.builder().setId(id)
                 .setIssuedAt(now)
                 .setSubject(subject)
                 .setIssuer(issuer)
                 .signWith(signatureAlgorithm, signingKey);
-
-        //if it has been specified, let's add the expiration
         if (ttlMillis > 0) {
             long expMillis = nowMillis + ttlMillis;
             Date exp = new Date(expMillis);
             builder.setExpiration(exp);
         }
-
-        //Builds the JWT and serializes it to a compact, URL-safe string
         return builder.compact();
+    }
+
+    /**
+     * метод декодинга токена
+     * @param jwt токен
+     * @return расшифрованный токен
+     */
+    @Override
+    public Claims decodeJWT(String jwt) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(DatatypeConverter.parseBase64Binary("SECRET_KEY"))
+                .parseClaimsJws(jwt).getBody();
+        return claims;
+    }
+
+    /**
+     * метод возращает токен из репозитория если такой токен существует
+     * @param token токен
+     * @return токен
+     */
+    @Override
+   public String find(String token){
+        return authRepository.find(token);
     }
 
 }

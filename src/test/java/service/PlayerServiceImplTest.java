@@ -1,7 +1,5 @@
 package service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import model.Player;
 import org.junit.Test;
 import repository.AuditRepository;
@@ -9,9 +7,8 @@ import repository.AuthRepository;
 import repository.HistoryCreditDebitRepository;
 import repository.PlayerRepository;
 
-import javax.xml.bind.DatatypeConverter;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
 public class PlayerServiceImplTest {
@@ -22,38 +19,56 @@ public class PlayerServiceImplTest {
     private final AuditRepository auditRepository = mock(AuditRepository.class);
     private final TransactionService transactionService = mock(TransactionService.class);
 
-    PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authRepository, historyCreditDebitRepository, auditRepository);
-    AuthService authService = new AuthServiceImpl(playerService, authRepository, auditRepository);
-
-    Player createDefaultPlayer() {
-        return new Player("Pavel", "password", 0);
-    }
+    AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
+    PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditRepository);
 
     @Test
-    public void create() {
-        Player playerDefault = createDefaultPlayer();
-        when(playerRepository.save(playerDefault)).thenReturn(new Player("Pavel", "password", 1));
-        Player player = playerService.create(playerDefault);
+    public void testThatDoneCreate() {
+        when(playerRepository.save(any(Player.class))).thenReturn(createDefaultPlayer());
+        Player player = playerService.create("Pavel", "password");
         assertThat(player.getId()).isEqualTo(1);
-        verify(playerRepository).save(playerDefault);
+        verify(playerRepository).save(any(Player.class));
     }
 
     @Test
-    public void getAccount() {
-        Player playerDefault = createDefaultPlayer();
-        when(playerService.findByNamePassword("Pavel", "password")).thenReturn(playerDefault);
+    public void testThatGetAccount() {
+        when(authRepository.find(anyString())).thenReturn("1");
+        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
+        when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
         String token = authService.doAuthorization("Pavel", "password");
-        when(authRepository.find(token)).thenReturn("1");
-        when(playerRepository.findById(0)).thenReturn(playerDefault);
         long account = playerService.getAccount(token);
         assertThat(account).isEqualTo(0);
     }
 
-
-    public static Claims decodeJWT(String jwt) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(DatatypeConverter.parseBase64Binary("SECRET_KEY"))
-                .parseClaimsJws(jwt).getBody();
-        return claims;
+    @Test
+    public void testThatFailDoDebit() {
+        when(authRepository.find(anyString())).thenReturn("1");
+        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
+        when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
+        String token = authService.doAuthorization("Pavel", "password");
+        Throwable throwable = catchThrowable(() -> {
+            playerService.debitAccount(token, 100, "1");
+        });
+        assertThat(throwable.getMessage()).isEqualTo("the player doesn't have enough money");
     }
+
+    @Test
+    public void testThatDoDebit() {
+        when(authRepository.find(anyString())).thenReturn("1");
+        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
+        when(playerRepository.update(any(Player.class))).thenReturn(createDefaultPlayer());
+        when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
+        String token = authService.doAuthorization("Pavel", "password");
+        try {
+            long account = playerService.debitAccount(token, 0, "1");
+            assertThat(account).isEqualTo(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    Player createDefaultPlayer() {
+        return new Player("Pavel", "password", 1);
+    }
+
 }
