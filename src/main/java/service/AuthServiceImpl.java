@@ -39,11 +39,11 @@ public class AuthServiceImpl implements AuthService {
         Player player = playerService.findByNamePassword(name, password);
 
         if (player == null) {
-            return "нет такого игрока";
+            return "this player doesn't exist";
         } else {
             String token = createJWT(String.valueOf(player.getId()), "test", player.toString(), System.currentTimeMillis());
             authRepository.save(token);
-            auditRepository.save(player.getId(), "авторизация прошла успешно");
+            auditRepository.save(player.getId(), "authorization completed successful");
             return token;
         }
     }
@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void exitAuthorization(String token) {
         Player player = playerService.findByToken(token);
-        auditRepository.save(player.getId(), "завершение работы");
+        auditRepository.save(player.getId(), "exit of authorization player done");
         authRepository.delete(token);
     }
 

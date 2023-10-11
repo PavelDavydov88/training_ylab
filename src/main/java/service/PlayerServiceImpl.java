@@ -43,12 +43,12 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public long getAccount(String token) {
         if (authRepository.find(token) == null) {
-            System.out.println("token не действительный");
+            System.out.println("invalid token");
             return 0;
         }
         int id = Integer.parseInt(decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
-        auditRepository.save(player.getId(), "запрос account");
+        auditRepository.save(player.getId(), "getting account");
         return player.getAccount();
     }
 
@@ -64,24 +64,24 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public long debitAccount(String token, long valueDebitAccount, String transaction) throws Exception {
         if (authRepository.find(token) == null) {
-            System.out.println("token не действительный");
+            System.out.println("invalid token");
             return 0;
         }
         int id = Integer.parseInt(decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
 
         if (transactionService.checkExist(transaction)) {
-            auditRepository.save(player.getId(), "debit не выполнено успешно, такая транзакция существует");
-            throw new Exception(transaction + " такая транзакция существует");
+            auditRepository.save(player.getId(), "debit operation have not been done, this transaction is exist");
+            throw new Exception(transaction + " this transaction is exist");
         }
         transactionService.save(transaction);
         if (player.getAccount() < valueDebitAccount) {
-            auditRepository.save(player.getId(), "debit не выполнено успешно, у игрока не достаточно средств");
-            throw new Exception("у игрока не достаточно средств");
+            auditRepository.save(player.getId(), "debit operation have not been done, the player doesn't have enough money");
+            throw new Exception("the player doesn't have enough money");
         }
         player.setAccount(player.getAccount() - valueDebitAccount);
         historyCreditDebitRepository.save(player.getId(), "debit account - " + valueDebitAccount);
-        auditRepository.save(player.getId(), "debit выполнено успешно");
+        auditRepository.save(player.getId(), "debit operation completed");
         player = playerRepository.update(player);
         return player.getAccount();
     }
@@ -98,19 +98,19 @@ public class PlayerServiceImpl implements PlayerService {
     public long creditAccount(String token, long valueCreditAccount, String transaction) throws Exception {
 
         if (authRepository.find(token) == null) {
-            System.out.println("token не действительный");
+            System.out.println("invalid token");
             return 0;
         }
         int id = Integer.parseInt(decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
         if (transactionService.checkExist(transaction)) {
-            auditRepository.save(player.getId(), "credit не выполнено успешно, такая транзакция существует");
-            throw new Exception(transaction + " такая транзакция существует");
+            auditRepository.save(player.getId(), "credit operation have not been done, this transaction is exist");
+            throw new Exception(transaction + " this transaction is exist");
         }
         transactionService.save(transaction);
         player.setAccount(player.getAccount() + valueCreditAccount);
         historyCreditDebitRepository.save(player.getId(), "credit account + " + valueCreditAccount);
-        auditRepository.save(player.getId(), "credit выполнено успешно");
+        auditRepository.save(player.getId(), "credit operation completed");
         player = playerRepository.update(player);
         return player.getAccount();
     }
@@ -123,7 +123,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Player create(Player inputPlayer) {
         Player player = playerRepository.save(inputPlayer);
-        auditRepository.save(player.getId(), "регистрация прошла успешно");
+        auditRepository.save(player.getId(), "registration completed successful");
         return player;
     }
 
@@ -135,11 +135,11 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public List<String> getListOperationAccount(String token) {
         if (authRepository.find(token) == null) {
-            System.out.println("token не действительный");
+            System.out.println("invalid token");
             return null;
         }
         int id = Integer.parseInt(decodeJWT(token).getId());
-        auditRepository.save(id, "запрос истории операций credit/debit");
+        auditRepository.save(id, "operation request history of credit/debit operations");
         return historyCreditDebitRepository.findById(id);
     }
 
@@ -162,7 +162,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public List<String> getListAuditAction(String token) {
         if (authRepository.find(token) == null) {
-            System.out.println("token не действительный");
+            System.out.println("invalid token");
             return null;
         }
         int id = Integer.parseInt(decodeJWT(token).getId());

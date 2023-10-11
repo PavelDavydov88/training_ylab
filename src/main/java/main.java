@@ -27,68 +27,68 @@ public class main {
                 case 0:
                     System.exit(0);
                 case 1: {
-                    System.out.println("регистрация игрока, введите Имя, Пароль");
+                    System.out.println("registration player, input Name, Password");
                     String name = input.next();
                     String password = input.next();
                     Player player = playerService.create(new Player(name, password, 0));
-                    System.out.println("игрок создан : " + player);
+                    System.out.println("player created : " + player);
                     break;
                 }
                 case 2: {
-                    System.out.println("авторизация игрока, введите Имя, Пароль");
+                    System.out.println("authorization player, input Name, Password");
                     String name = input.next();
                     String password = input.next();
                     String token = authService.doAuthorization(name, password);
-                    System.out.println("ваш token : " + token);
+                    System.out.println("your token : " + token);
                     break;
                 }
                 case 3: {
-                    System.out.println("текущий баланс игрока, введите ваш token");
+                    System.out.println("current account of the player, input your token");
                     String token = input.next();
-                    System.out.println("ваш баланс : " + playerService.getAccount(token));
+                    System.out.println("your current account : " + playerService.getAccount(token));
                     break;
                 }
                 case 4: {
-                    System.out.println("дебет/снятие средств игрока, введите ваш token, значение дебета, номер транзакции");
+                    System.out.println("debit operation of the player, input your token,value of credit, ID transaction");
                     String token = input.next();
                     long valueDebit = input.nextLong();
                     String transaction = input.next();
                     try {
-                        System.out.println("ваш баланс : " + playerService.debitAccount(token, valueDebit, transaction));
+                        System.out.println("your current account : " + playerService.debitAccount(token, valueDebit, transaction));
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
                     break;
                 }
                 case 5: {
-                    System.out.println("кредит средств игрока, введите ваш token, значение кредита, номер транзакции");
+                    System.out.println("credit operation of the player, input your token, value of debit, ID transaction");
                     String token = input.next();
                     long valueCredit = input.nextLong();
                     String transaction = input.next();
                     try {
-                        System.out.println("ваш баланс: " + playerService.creditAccount(token, valueCredit, transaction));
+                        System.out.println("your current account: " + playerService.creditAccount(token, valueCredit, transaction));
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
                     break;
                 }
                 case 6: {
-                    System.out.println("просмотр истории пополнения/снятия средств игрока, введите ваш token");
+                    System.out.println("listing of the history debit/credit operation of the player, input your token");
                     String token = input.next();
-                    System.out.println("история пополнения/снятия : " + playerService.getListOperationAccount(token));
+                    System.out.println("your history debit/credit operation : " + playerService.getListOperationAccount(token));
                     break;
                 }
                 case 7: {
-                    System.out.println("аудит действий игрока, введите ваш token");
+                    System.out.println("audit of the player, input your token");
                     String token = input.next();
-                    System.out.println("аудит действий : " + playerService.getListAuditAction(token));
+                    System.out.println("your audit : " + playerService.getListAuditAction(token));
                     break;
                 }
                 case 8: {
-                    System.out.println("выход игрока, введите ваш token");
+                    System.out.println("exit of authorization, input your token");
                     String token = input.next();
                     authService.exitAuthorization(token);
-                    System.out.println("выход игрока выполнен");
+                    System.out.println("exit of authorization player done");
                     break;
                 }
 
@@ -100,15 +100,15 @@ public class main {
     public static void menu() {
         // Printing statements displaying menu on console
         System.out.println("MENU");
-        System.out.println("1: регистрация игрока");
-        System.out.println("2: авторизация игрока");
-        System.out.println("3: текущий баланс игрока");
-        System.out.println("4: дебет/снятие средств игрока");
-        System.out.println("5: кредит на игрока");
-        System.out.println("6: просмотр истории пополнения/снятия средств игроком");
-        System.out.println("7: аудит действий игрока");
-        System.out.println("8: выход игрока");
-        System.out.println("0: выход из программы");
+        System.out.println("1: registration player");
+        System.out.println("2: authorization player");
+        System.out.println("3: current account of the player");
+        System.out.println("4: debit operation of the player");
+        System.out.println("5: credit operation of the player");
+        System.out.println("6: listing of the history debit/credit operation of the player");
+        System.out.println("7: audit of the player");
+        System.out.println("8: exit of authorization");
+        System.out.println("0: exit of program");
         System.out.print("Enter your selection : ");
     }
 }
