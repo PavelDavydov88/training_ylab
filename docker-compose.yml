@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  service-db:
+    container_name: pg_db
+    image: postgres:14.7-alpine
+    environment:
+      POSTRES_DB : ylabdb
+      POSTGRES_USER: ylabuser
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "15432:5432"

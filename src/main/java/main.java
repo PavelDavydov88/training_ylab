@@ -1,11 +1,39 @@
-import model.Player;
+import config.ConnectionUtils;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import repository.*;
 import service.*;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, DatabaseException {
+        Connection connection = null;
+        Database database = null;
+        Statement statement = null;
+        try {
+            connection = ConnectionUtils.getConnection();
+            database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+            String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
+            statement = connection.createStatement();
+            statement.executeUpdate(sql);
+            database.setDefaultSchemaName("liquibase");
+            Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
+            System.out.println("connection from main close=" + connection.isClosed());
+            liquibase.update();
+            System.out.println("Миграции успешно выполнены!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("connection from main close=" + connection.isClosed());
 
         PlayerRepository playerRepository = new PlayerRepositoryImpl();
         AuthRepository authRepository = new AuthRepositoryImpl();
@@ -13,9 +41,10 @@ public class main {
         HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl();
         AuditRepository auditRepository = new AuditRepositoryImpl();
 
-        AuthService authService = new AuthServiceImpl(playerRepository,authRepository, auditRepository);
+        AuditService auditService = new AuditServiceImpl(auditRepository);
+        AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
         TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
-        PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditRepository);
+        PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
 
         Scanner input = new Scanner(System.in);
         int option;
@@ -25,13 +54,17 @@ public class main {
             option = input.nextInt();
             switch (option) {
                 case 0:
+                    connection.close();
+                    database.close();
+                    statement.close();
+                    System.out.println("connection from main close=" + connection.isClosed());
                     System.exit(0);
                 case 1: {
                     System.out.println("registration player, input Name, Password");
                     String name = input.next();
                     String password = input.next();
-                    Player player = playerService.create(name, password);
-                    System.out.println("player created : " + player);
+                    playerService.create(name, password);
+                    System.out.println("player created : ");
                     break;
                 }
                 case 2: {
@@ -91,9 +124,7 @@ public class main {
                     System.out.println("exit of authorization player done");
                     break;
                 }
-
             }
-
         }
     }
 

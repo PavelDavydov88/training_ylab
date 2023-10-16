@@ -1,9 +1,10 @@
 package repository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface AuditRepository {
-    String save(long idPlayer, String historyText);
+    void save(long idPlayer, String historyText) throws SQLException;
 
-    List<String> findById(long idPlayer);
+    List<String> findAllById(long idPlayer) throws SQLException;
 }

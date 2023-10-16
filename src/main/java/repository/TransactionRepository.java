@@ -1,9 +1,11 @@
 package repository;
 
+import java.sql.SQLException;
+
 public interface TransactionRepository {
 
-    String save(String transaction);
+    void save(String transaction) throws SQLException;
 
-    String find(String transaction);
+    String find(String transaction) throws SQLException;
 
 }

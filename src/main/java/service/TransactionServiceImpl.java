@@ -1,38 +1,40 @@
 package service;
 
+import lombok.RequiredArgsConstructor;
 import repository.TransactionRepository;
+
+import java.sql.SQLException;
 
 /**
  * класс предоставляет сервис по работе с транзакциями
  */
+@RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
-    private  final TransactionRepository transactionRepository;
-
-    public TransactionServiceImpl(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
-    }
+    private final TransactionRepository transactionRepository;
 
     /**
      * метод для сохранения транзакции в репозитории
+     *
      * @param transaction номер транзакции
      * @return возращает номер транзакции
      */
     @Override
-    public String save(String transaction) {
+    public void save(String transaction) throws SQLException {
         if (!checkExist(transaction)) {
-            return transactionRepository.save(transaction);
-        }
-        else return null;
+            transactionRepository.save(transaction);
+        } else throw new SQLException("this transaction exist");
     }
 
     /**
      * метод рповерки существоания номера транзакции
+     *
      * @param transaction номера транзакции
      * @return true если номера транзакции существует, false если нет
      */
     @Override
-    public boolean checkExist(String transaction) {
+    public boolean checkExist(String transaction) throws SQLException {
+
         return transactionRepository.find(transaction) != null;
     }
 }
