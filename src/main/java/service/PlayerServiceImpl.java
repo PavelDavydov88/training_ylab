@@ -122,10 +122,11 @@ public class PlayerServiceImpl implements PlayerService {
         Player inputPlayer = new Player(0, name, password, 0);
         try {
             playerRepository.save(inputPlayer);
+            Player player = playerRepository.findByNamePassword(name, password);
+            auditService.sendEvent(player.getId(), "registration completed successful");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        auditService.sendEvent(1, "registration completed successful");
     }
 
     /**

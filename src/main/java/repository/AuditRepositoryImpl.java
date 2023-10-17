@@ -13,15 +13,17 @@ import java.util.List;
 
 public class AuditRepositoryImpl implements AuditRepository {
 
+    public static final String INSERT_AUDIT = "INSERT INTO wallet.\"audit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_audit'), ?, ?)";
+    public static final String SELECT_FIND_AUDIT = "select * from wallet.\"audit\" where \"id_player\" = ?";
+
     @Override
     public void save(long idPlayer, String historyText) throws SQLException {
         String historyWithDate = historyText + ", time = " + new Date();
-        String insertDataSQL = "INSERT INTO wallet.\"audit-liquibase\" (\"idPlayer\", \"operation\") VALUES (?, ?)";
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
             connection = ConnectionUtils.getConnection();
-            preparedStatement = connection.prepareStatement(insertDataSQL);
+            preparedStatement = connection.prepareStatement(INSERT_AUDIT);
             preparedStatement.setLong(1, idPlayer);
             preparedStatement.setString(2, historyWithDate);
             preparedStatement.executeUpdate();
@@ -38,13 +40,12 @@ public class AuditRepositoryImpl implements AuditRepository {
     @Override
     public List<String> findAllById(long id) throws SQLException {
         List<String> listHistory = new ArrayList<>();
-        String insertDataSQL = "select * from wallet.\"audit-liquibase\" where \"idPlayer\" = ?";
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
             connection = ConnectionUtils.getConnection();
-            preparedStatement = connection.prepareStatement(insertDataSQL);
+            preparedStatement = connection.prepareStatement(SELECT_FIND_AUDIT);
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
             String operation;

@@ -1,5 +1,6 @@
 package model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -7,17 +8,12 @@ import lombok.Data;
  */
 
 @Data
+@AllArgsConstructor
 public class Player {
-    private long account;
-    private String name, password;
     private long id;
-
-    public Player(long id, String name, String password, long account) {
-        this.account = account;
-        this.name = name;
-        this.id = id;
-        this.password = password;
-    }
+    private String name;
+    private String password;
+    private long account;
 
     @Override
     public String toString() {

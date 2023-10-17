@@ -13,15 +13,17 @@ import java.util.List;
 
 public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
 
+    public static final String INSERT_HISTORY = "INSERT INTO wallet.\"history-credit-debit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_history'), ?, ?)";
+    public static final String SELECT_FIND_HISTORY = "select * from wallet.\"history-credit-debit\" where \"id_player\" = ?";
+
     @Override
     public void save(long idPlayer, String historyText) throws SQLException {
         String historyWithDate = historyText + ", time = " + new Date();
-        String insertDataSQL = "INSERT INTO wallet.\"history-credit-debit-liquibase\" (\"idPlayer\", \"operation\") VALUES (?, ?)";
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
             connection = ConnectionUtils.getConnection();
-            preparedStatement = connection.prepareStatement(insertDataSQL);
+            preparedStatement = connection.prepareStatement(INSERT_HISTORY);
             preparedStatement.setLong(1, idPlayer);
             preparedStatement.setString(2, historyWithDate);
             preparedStatement.executeUpdate();
@@ -38,13 +40,12 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
     @Override
     public List<String> findById(long id) throws SQLException {
         List<String> listHistory = new ArrayList<>();
-        String insertDataSQL = "select * from wallet.\"history-credit-debit-liquibase\" where \"idPlayer\" = ?";
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
             connection = ConnectionUtils.getConnection();
-            preparedStatement = connection.prepareStatement(insertDataSQL);
+            preparedStatement = connection.prepareStatement(SELECT_FIND_HISTORY);
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
             String operation;

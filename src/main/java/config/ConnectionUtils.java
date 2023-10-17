@@ -6,21 +6,22 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionUtils {
-    private static ConnectionUtils INSTANCE;
 
     private ConnectionUtils() {
     }
 
-    public static ConnectionUtils getINSTANCE() {
-        if (INSTANCE == null) {
-            INSTANCE = new ConnectionUtils();
-        }
-        return INSTANCE;
-    }
+//    static ConnectionUtils INSTANCE;
+//
+//    public static ConnectionUtils getINSTANCE() {
+//        if (INSTANCE == null) {
+//            INSTANCE = new ConnectionUtils();
+//        }
+//        return INSTANCE;
+//    }
 
     public static Connection getConnection() throws IOException, SQLException {
         Connection connection = null;
-        final String URL = PropertyUtils.getProperty("db.host");
+        final String URL = PropertyUtils.getProperty("db.url");
         final String USER_NAME = PropertyUtils.getProperty("db.user");
         final String PASSWORD = PropertyUtils.getProperty("db.password");
         try {

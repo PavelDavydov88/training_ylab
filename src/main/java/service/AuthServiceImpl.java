@@ -121,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
      * @return токен
      */
     @Override
-    public String find(String token) {
+    public String find(String token) throws SQLException {
         return authRepository.find(token);
     }
 

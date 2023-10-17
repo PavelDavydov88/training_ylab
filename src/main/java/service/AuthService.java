@@ -13,5 +13,5 @@ public interface AuthService {
 
     String createJWT(String id, String issuer, String subject, long ttlMillis);
 
-    String find(String token);
+    String find(String token) throws SQLException;
 }

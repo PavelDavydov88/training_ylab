@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class main {
+public class Main {
     public static void main(String[] args) throws SQLException, DatabaseException {
         Connection connection = null;
         Database database = null;
@@ -26,7 +26,6 @@ public class main {
             statement.executeUpdate(sql);
             database.setDefaultSchemaName("liquibase");
             Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
-            System.out.println("connection from main close=" + connection.isClosed());
             liquibase.update();
             System.out.println("Миграции успешно выполнены!");
         } catch (Exception e) {
