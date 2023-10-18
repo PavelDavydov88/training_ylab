@@ -7,7 +7,6 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import model.Player;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,17 +19,19 @@ import java.sql.Statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PlayerRepositoryImplTest {
+public class TransactionRepositoryImplTest {
 
     @Rule
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
-    PlayerRepository playerRepository;
-    public static final String INSERT_PLAYER = "INSERT INTO wallet.\"player\" (\"id\", user_name, password, account) VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)";
+    TransactionRepository transactionRepository;
+
+    public static final String INSERT_TRANSACTION = "INSERT INTO wallet.\"transaction\" (\"id\" ,\"name_transaction\") VALUES (nextval( 'wallet.sequence_transaction'), '1')";
+
     @Before
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
-        playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
+        transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
         Connection connection = DriverManager
                 .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
@@ -43,25 +44,25 @@ public class PlayerRepositoryImplTest {
         connection = DriverManager
                 .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
         statement = connection.createStatement();
-        statement.executeUpdate(INSERT_PLAYER);
+        statement.executeUpdate(INSERT_TRANSACTION);
     }
 
     @Test
-    public void thatSavePlayer() throws SQLException {
-        Player defaultPlayer = getDefaultPlayer();
-        playerRepository.save(defaultPlayer);
-        Player player = playerRepository.findByNamePassword(defaultPlayer.getName(), defaultPlayer.getPassword());
-        assertThat(player.getId()).isEqualTo(11);
-        assertThat(player.getName()).isEqualTo("Ivan");
+    public void testThatSaveTransaction() throws SQLException {
+        transactionRepository.save("2");
+        String transaction = transactionRepository.find("2");
+        assertThat(transaction).isEqualTo("2");
     }
 
     @Test
-    public void thatFindById() throws SQLException {
-        Player player = playerRepository.findById(10);
-        assertThat(player.getName()).isEqualTo("Pavel");
+    public void thatFindByNameTransaction() throws SQLException {
+        String transaction = transactionRepository.find("1");
+        assertThat(transaction).isEqualTo("1");
     }
 
-    private Player getDefaultPlayer() {
-        return new Player(0, "Ivan", "789", 0);
+    @Test
+    public void thatFindByNameTransactionReturnNull() throws SQLException {
+        String transaction = transactionRepository.find("0");
+        assertThat(transaction).isNull();
     }
 }

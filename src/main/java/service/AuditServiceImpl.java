@@ -13,7 +13,8 @@ public class AuditServiceImpl implements AuditService {
 
     /**
      * метод записывает события в репозиторий
-     * @param playerId  ID игрока
+     *
+     * @param playerId     ID игрока
      * @param auditMessage текст события
      * @throws SQLException
      */
@@ -24,6 +25,7 @@ public class AuditServiceImpl implements AuditService {
 
     /**
      * метод возращает список событий игрока
+     *
      * @param playerId ID игрока
      * @return коллекция событий
      * @throws SQLException

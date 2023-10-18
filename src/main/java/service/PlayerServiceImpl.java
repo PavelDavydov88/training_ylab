@@ -113,6 +113,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     /**
      * метод создания игрока
+     *
      * @param name     имя
      * @param password пароль
      * @throws SQLException
