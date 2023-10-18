@@ -1,16 +1,21 @@
 package repository;
 
-import config.ConnectionUtils;
+import config.DBConnectionProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
+@RequiredArgsConstructor
 @Slf4j
 public class AuthRepositoryImpl implements AuthRepository {
+
+
+    private final DBConnectionProvider dbConnectionProvider;
 
     public static final String INSERT_TOKEN = "INSERT INTO wallet.\"auth\" (\"id\" ,\"token\") VALUES (nextval( 'wallet.sequence_auth'), ?)";
     public static final String SELECT_FIND_TOKEN = "select * from wallet.\"auth\" where \"token\" = ?";
@@ -21,13 +26,11 @@ public class AuthRepositoryImpl implements AuthRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(INSERT_TOKEN);
             preparedStatement.setString(1, token);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();
@@ -41,7 +44,7 @@ public class AuthRepositoryImpl implements AuthRepository {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(SELECT_FIND_TOKEN);
             preparedStatement.setString(1, token);
             resultSet = preparedStatement.executeQuery();
@@ -51,8 +54,6 @@ public class AuthRepositoryImpl implements AuthRepository {
                 return null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();
@@ -66,7 +67,7 @@ public class AuthRepositoryImpl implements AuthRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(DELETE_TOKEN);
             preparedStatement.setString(1, token);
             System.out.println(preparedStatement);
@@ -75,8 +76,6 @@ public class AuthRepositoryImpl implements AuthRepository {
                 log.info("this token don't exist");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();

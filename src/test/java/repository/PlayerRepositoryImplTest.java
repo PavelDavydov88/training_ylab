@@ -1,6 +1,6 @@
 package repository;
 
-import config.ConnectionUtils;
+import config.DBConnectionProvider;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
@@ -8,21 +8,16 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import model.Player;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PlayerRepositoryImplTest {
@@ -30,41 +25,31 @@ public class PlayerRepositoryImplTest {
     @Rule
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
-    PlayerRepository playerRepository = new PlayerRepositoryImpl();
+    PlayerRepository playerRepository;
 
-
-    MockedStatic<ConnectionUtils> connectionUtilsMockedStatic = Mockito.mockStatic(ConnectionUtils.class);
-
-
-
-    Connection getTestConnection() {
-            String jdbcUrl = postgresContainer.getJdbcUrl();
-            String username = postgresContainer.getUsername();
-            String password = postgresContainer.getPassword();
-            try {
-                Connection connection = DriverManager
-                        .getConnection(jdbcUrl, username, password);
-                Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-                String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
-                Statement statement = connection.createStatement();
-                statement.executeUpdate(sql);
-                database.setDefaultSchemaName("liquibase");
-                Liquibase liquibase = new Liquibase("db/test_changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
-                liquibase.update();
-                return connection;
-            } catch (SQLException | LiquibaseException e) {
-                throw new RuntimeException(e);
-            }
+    @Before
+    public void setUp() throws SQLException, LiquibaseException {
+        DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
+        playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
+        Connection connection = DriverManager
+                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
+        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+        String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(sql);
+        database.setDefaultSchemaName("liquibase");
+        Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
+        liquibase.update();
+        connection = DriverManager
+                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
+        statement = connection.createStatement();
+        statement.executeUpdate("INSERT INTO wallet.\"player\" (\"id\", user_name, password, account) VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0);");
     }
 
-
     @Test
-    public void thatSavePlayer() throws SQLException, IOException {
+    public void thatSavePlayer() throws SQLException {
         Player defaultPlayer = getDefaultPlayer();
-
-        connectionUtilsMockedStatic.when(ConnectionUtils::getConnection).thenReturn(getTestConnection());
         playerRepository.save(defaultPlayer);
-        connectionUtilsMockedStatic.when(ConnectionUtils::getConnection).thenReturn(getTestConnection());
         Player player = playerRepository.findByNamePassword(defaultPlayer.getName(), defaultPlayer.getPassword());
         System.out.println(player);
         assertThat(player.getId()).isEqualTo(11);
@@ -73,7 +58,6 @@ public class PlayerRepositoryImplTest {
 
     @Test
     public void thatFindById() throws SQLException {
-        connectionUtilsMockedStatic.when(ConnectionUtils::getConnection).thenReturn(getTestConnection());
         Player player = playerRepository.findById(10);
         System.out.println(player);
         assertThat(player.getName()).isEqualTo("Pavel");

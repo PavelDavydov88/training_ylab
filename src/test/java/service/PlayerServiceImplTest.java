@@ -27,6 +27,7 @@ public class PlayerServiceImplTest {
 
     @Test
     public void testThatDoneCreate() throws SQLException {
+        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
         playerService.create("Pavel", "password");
         verify(playerRepository).save(any(Player.class));
     }

@@ -1,4 +1,4 @@
-import config.ConnectionUtils;
+import config.DBConnectionProvider;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
@@ -8,18 +8,22 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import repository.*;
 import service.*;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import static config.PropertyUtils.getProperty;
+
 public class Main {
-    public static void main(String[] args) throws SQLException, DatabaseException {
+    public static void main(String[] args) throws SQLException, DatabaseException, IOException {
         Connection connection = null;
         Database database = null;
         Statement statement = null;
+        DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
             statement = connection.createStatement();
@@ -32,13 +36,11 @@ public class Main {
             e.printStackTrace();
         }
 
-        System.out.println("connection from main close=" + connection.isClosed());
-
-        PlayerRepository playerRepository = new PlayerRepositoryImpl();
-        AuthRepository authRepository = new AuthRepositoryImpl();
-        TransactionRepository transactionRepository = new TransactionRepositoryImpl();
-        HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl();
-        AuditRepository auditRepository = new AuditRepositoryImpl();
+        PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
+        AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
+        TransactionRepository transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
+        HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
+        AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
 
         AuditService auditService = new AuditServiceImpl(auditRepository);
         AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);

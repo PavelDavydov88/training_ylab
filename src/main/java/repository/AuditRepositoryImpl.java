@@ -1,8 +1,9 @@
 package repository;
 
-import config.ConnectionUtils;
 
-import java.io.IOException;
+import config.DBConnectionProvider;
+import lombok.RequiredArgsConstructor;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,8 +12,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class AuditRepositoryImpl implements AuditRepository {
 
+    private final DBConnectionProvider dbConnectionProvider;
     public static final String INSERT_AUDIT = "INSERT INTO wallet.\"audit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_audit'), ?, ?)";
     public static final String SELECT_FIND_AUDIT = "select * from wallet.\"audit\" where \"id_player\" = ?";
 
@@ -22,14 +25,12 @@ public class AuditRepositoryImpl implements AuditRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(INSERT_AUDIT);
             preparedStatement.setLong(1, idPlayer);
             preparedStatement.setString(2, historyWithDate);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();
@@ -44,7 +45,7 @@ public class AuditRepositoryImpl implements AuditRepository {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(SELECT_FIND_AUDIT);
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
@@ -55,8 +56,6 @@ public class AuditRepositoryImpl implements AuditRepository {
             }
             return listHistory;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();

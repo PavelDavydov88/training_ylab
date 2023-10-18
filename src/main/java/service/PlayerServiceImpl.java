@@ -110,12 +110,12 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getAccount();
     }
 
+
     /**
      * метод создания игрока
-     *
      * @param name     имя
      * @param password пароль
-     * @return новый игрок
+     * @throws SQLException
      */
     @Override
     public void create(String name, String password) throws SQLException {

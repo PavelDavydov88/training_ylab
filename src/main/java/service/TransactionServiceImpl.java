@@ -15,9 +15,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * метод для сохранения транзакции в репозитории
-     *
      * @param transaction номер транзакции
-     * @return возращает номер транзакции
+     * @throws SQLException
      */
     @Override
     public void save(String transaction) throws SQLException {

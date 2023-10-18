@@ -1,17 +1,18 @@
 package repository;
 
-import config.ConnectionUtils;
+import config.DBConnectionProvider;
+import lombok.RequiredArgsConstructor;
 import model.Player;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@RequiredArgsConstructor
 public class PlayerRepositoryImpl implements PlayerRepository {
 
-
+    private final DBConnectionProvider dbConnectionProvider;
     public static final String UPDATE_PLAYER = "UPDATE wallet.\"player\" SET account = ? WHERE id = ?";
     public static final String INSERT_PLAYER = "INSERT INTO wallet.\"player\" (\"id\", user_name, password, account) VALUES (nextval( 'wallet.sequence_player'), ?, ?, ?)";
     public static final String SELECT_FIND_BY_ID_PLAYER = "select * from wallet.\"player\" where id = ?";
@@ -22,13 +23,13 @@ public class PlayerRepositoryImpl implements PlayerRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(INSERT_PLAYER);
             preparedStatement.setString(1, inputPlayer.getName());
             preparedStatement.setString(2, inputPlayer.getPassword());
             preparedStatement.setInt(3, 0);
             preparedStatement.executeUpdate();
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();
@@ -42,7 +43,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             ;
             preparedStatement = connection.prepareStatement(SELECT_FIND_BY_ID_PLAYER);
             preparedStatement.setLong(1, id);
@@ -62,8 +63,6 @@ public class PlayerRepositoryImpl implements PlayerRepository {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         } finally {
             connection.close();
             preparedStatement.close();
@@ -77,7 +76,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(SELECT_FIND_BY_NAME_PASSWORD);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, password);
@@ -93,7 +92,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
                 System.out.println("Record not found.");
             }
             return new Player(idResult, nameResult, passwordResult, accountResult);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();
@@ -107,15 +106,13 @@ public class PlayerRepositoryImpl implements PlayerRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             ;
             preparedStatement = connection.prepareStatement(UPDATE_PLAYER);
             preparedStatement.setLong(1, updatePlayer.getAccount());
             preparedStatement.setLong(2, updatePlayer.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();

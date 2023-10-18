@@ -1,6 +1,7 @@
 package repository;
 
-import config.ConnectionUtils;
+import config.DBConnectionProvider;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,8 +12,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
-
+    private final DBConnectionProvider dbConnectionProvider;
     public static final String INSERT_HISTORY = "INSERT INTO wallet.\"history-credit-debit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_history'), ?, ?)";
     public static final String SELECT_FIND_HISTORY = "select * from wallet.\"history-credit-debit\" where \"id_player\" = ?";
 
@@ -22,14 +24,12 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(INSERT_HISTORY);
             preparedStatement.setLong(1, idPlayer);
             preparedStatement.setString(2, historyWithDate);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             connection.close();
@@ -44,7 +44,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-            connection = ConnectionUtils.getConnection();
+            connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(SELECT_FIND_HISTORY);
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
@@ -56,9 +56,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
             return listHistory;
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
+        }  finally {
             connection.close();
             preparedStatement.close();
             resultSet.close();
