@@ -12,17 +12,18 @@ import java.sql.SQLException;
 public class TransactionRepositoryImpl implements TransactionRepository {
 
     private final DBConnectionProvider dbConnectionProvider;
-    public static final String INSERT_TRANSACTION = "INSERT INTO wallet.\"transaction\" (\"id\" ,\"name_transaction\") VALUES (nextval( 'wallet.sequence_transaction'), ?)";
+    public static final String INSERT_TRANSACTION = "INSERT INTO wallet.\"transaction\" (\"id\", \"id_player\" ,\"name_transaction\") VALUES (nextval( 'wallet.sequence_transaction'), ?, ?)";
     public static final String SELECT_FIND_TRANSACTION = "select * from wallet.\"transaction\" where \"name_transaction\" = ?";
 
     @Override
-    public void save(String transaction) throws SQLException {
+    public void save(Long idPlayer, String transaction) throws SQLException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
             connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(INSERT_TRANSACTION);
-            preparedStatement.setString(1, transaction);
+            preparedStatement.setLong(1, idPlayer);
+            preparedStatement.setString(2, transaction);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

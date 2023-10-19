@@ -19,9 +19,9 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws SQLException
      */
     @Override
-    public void save(String transaction) throws SQLException {
+    public void save(Long idPlayer, String transaction) throws SQLException {
         if (!checkExist(transaction)) {
-            transactionRepository.save(transaction);
+            transactionRepository.save(idPlayer, transaction);
         } else throw new SQLException("this transaction exist");
     }
 

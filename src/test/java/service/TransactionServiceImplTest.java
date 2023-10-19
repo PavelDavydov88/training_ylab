@@ -20,8 +20,8 @@ public class TransactionServiceImplTest {
 
     @Test
     public void testThatSaveTransaction() throws SQLException {
-        transactionService.save("1");
-        verify(transactionRepository).save(anyString());
+        transactionService.save(1L, "1");
+        verify(transactionRepository).save(anyLong(), anyString());
     }
 
     @Test

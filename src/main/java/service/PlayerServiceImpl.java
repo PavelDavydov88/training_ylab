@@ -61,14 +61,14 @@ public class PlayerServiceImpl implements PlayerService {
             log.info("invalid token");
             return 0;
         }
-        int id = Integer.parseInt(authService.decodeJWT(token).getId());
+        long id = Long.parseLong(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
 
         if (transactionService.checkExist(transaction)) {
             auditService.sendEvent(player.getId(), "debit operation have not been done, this transaction is exist");
             throw new Exception(transaction + " this transaction is exist");
         }
-        transactionService.save(transaction);
+        transactionService.save(id, transaction);
         if (player.getAccount() < valueDebitAccount) {
             auditService.sendEvent(player.getId(), "debit operation have not been done, the player doesn't have enough money");
             throw new Exception("the player doesn't have enough money");
@@ -96,13 +96,13 @@ public class PlayerServiceImpl implements PlayerService {
             log.info("invalid token");
             return 0;
         }
-        int id = Integer.parseInt(authService.decodeJWT(token).getId());
+        long id = Long.parseLong(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
         if (transactionService.checkExist(transaction)) {
             auditService.sendEvent(player.getId(), "credit operation have not been done, this transaction is exist");
             throw new Exception(transaction + " this transaction is exist");
         }
-        transactionService.save(transaction);
+        transactionService.save(id, transaction);
         player.setAccount(player.getAccount() + valueCreditAccount);
         historyCreditDebitRepository.save(player.getId(), "credit account + " + valueCreditAccount);
         auditService.sendEvent(player.getId(), "credit operation completed");

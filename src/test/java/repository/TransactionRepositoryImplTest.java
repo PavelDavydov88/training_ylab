@@ -26,7 +26,7 @@ public class TransactionRepositoryImplTest {
 
     TransactionRepository transactionRepository;
 
-    public static final String INSERT_TRANSACTION = "INSERT INTO wallet.\"transaction\" (\"id\" ,\"name_transaction\") VALUES (nextval( 'wallet.sequence_transaction'), '1')";
+    public static final String INSERT_TRANSACTION = "INSERT INTO wallet.\"transaction\" (\"id\" , \"id_player\",\"name_transaction\") VALUES (nextval( 'wallet.sequence_transaction'), 10,'1')";
 
     @Before
     public void setUp() throws SQLException, LiquibaseException {
@@ -49,7 +49,7 @@ public class TransactionRepositoryImplTest {
 
     @Test
     public void testThatSaveTransaction() throws SQLException {
-        transactionRepository.save("2");
+        transactionRepository.save(1l,"2");
         String transaction = transactionRepository.find("2");
         assertThat(transaction).isEqualTo("2");
     }
