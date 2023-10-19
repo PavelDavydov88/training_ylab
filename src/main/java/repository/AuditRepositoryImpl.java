@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * класс для хранения audit
+ */
 @RequiredArgsConstructor
 public class AuditRepositoryImpl implements AuditRepository {
 
@@ -19,6 +22,13 @@ public class AuditRepositoryImpl implements AuditRepository {
     public static final String INSERT_AUDIT = "INSERT INTO wallet.\"audit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_audit'), ?, ?)";
     public static final String SELECT_FIND_AUDIT = "select * from wallet.\"audit\" where \"id_player\" = ?";
 
+    /**
+     * метод сохраняет действия игрока
+     *
+     * @param idPlayer    ID игрока
+     * @param historyText действия игрока
+     * @throws SQLException
+     */
     @Override
     public void save(long idPlayer, String historyText) throws SQLException {
         String historyWithDate = historyText + ", time = " + new Date();
@@ -38,6 +48,13 @@ public class AuditRepositoryImpl implements AuditRepository {
         }
     }
 
+    /**
+     * метод возращает все действия игрока
+     *
+     * @param id ID игрока
+     * @return список действий игрока
+     * @throws SQLException
+     */
     @Override
     public List<String> findAllById(long id) throws SQLException {
         List<String> listHistory = new ArrayList<>();

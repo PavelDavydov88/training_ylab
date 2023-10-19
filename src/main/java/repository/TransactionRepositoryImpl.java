@@ -8,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * класс для хранения транзакций
+ */
 @RequiredArgsConstructor
 public class TransactionRepositoryImpl implements TransactionRepository {
 
@@ -15,6 +18,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     public static final String INSERT_TRANSACTION = "INSERT INTO wallet.\"transaction\" (\"id\", \"id_player\" ,\"name_transaction\") VALUES (nextval( 'wallet.sequence_transaction'), ?, ?)";
     public static final String SELECT_FIND_TRANSACTION = "select * from wallet.\"transaction\" where \"name_transaction\" = ?";
 
+    /**
+     * метод сохраняет транзакцию
+     *
+     * @param idPlayer    ID игрока
+     * @param transaction транзакция
+     * @throws SQLException
+     */
     @Override
     public void save(Long idPlayer, String transaction) throws SQLException {
         Connection connection = null;
@@ -33,6 +43,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
     }
 
+    /**
+     * метод поиска транзакции
+     *
+     * @param transaction транзакция
+     * @return транзакцию. Если не существует, возращает null
+     * @throws SQLException
+     */
     @Override
     public String find(String transaction) throws SQLException {
         Connection connection = null;

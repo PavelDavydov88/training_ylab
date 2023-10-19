@@ -15,6 +15,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * метод для сохранения транзакции в репозитории
+     *
+     * @param idPlayer    ID игрока
      * @param transaction номер транзакции
      * @throws SQLException
      */

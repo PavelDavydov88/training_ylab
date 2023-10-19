@@ -110,7 +110,6 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getAccount();
     }
 
-
     /**
      * метод создания игрока
      *

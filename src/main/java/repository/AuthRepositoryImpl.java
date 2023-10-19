@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
+/**
+ * класс для хранения auth
+ */
 @RequiredArgsConstructor
 @Slf4j
 public class AuthRepositoryImpl implements AuthRepository {
@@ -21,6 +23,12 @@ public class AuthRepositoryImpl implements AuthRepository {
     public static final String SELECT_FIND_TOKEN = "select * from wallet.\"auth\" where \"token\" = ?";
     public static final String DELETE_TOKEN = "delete from wallet.\"auth\" where \"token\" = ?";
 
+    /**
+     * метод сохраняет токен
+     *
+     * @param token токен
+     * @throws SQLException
+     */
     @Override
     public void save(String token) throws SQLException {
         Connection connection = null;
@@ -38,6 +46,13 @@ public class AuthRepositoryImpl implements AuthRepository {
         }
     }
 
+    /**
+     * метод возращает токен
+     *
+     * @param token токен
+     * @return
+     * @throws SQLException
+     */
     @Override
     public String find(String token) throws SQLException {
         Connection connection = null;
@@ -62,6 +77,12 @@ public class AuthRepositoryImpl implements AuthRepository {
         }
     }
 
+    /**
+     * метод удаляет токен
+     *
+     * @param token
+     * @throws SQLException
+     */
     @Override
     public void delete(String token) throws SQLException {
         Connection connection = null;

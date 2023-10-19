@@ -9,6 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * класс для хранения игрока
+ */
 @RequiredArgsConstructor
 public class PlayerRepositoryImpl implements PlayerRepository {
 
@@ -18,6 +21,12 @@ public class PlayerRepositoryImpl implements PlayerRepository {
     public static final String SELECT_FIND_BY_ID_PLAYER = "select * from wallet.\"player\" where id = ?";
     public static final String SELECT_FIND_BY_NAME_PASSWORD = "select * from wallet.\"player\" where user_name=? and \"password\"=?";
 
+    /**
+     * метод сохраняет игрока
+     *
+     * @param inputPlayer данные игрока
+     * @throws SQLException
+     */
     @Override
     public void save(Player inputPlayer) throws SQLException {
         Connection connection = null;
@@ -37,6 +46,13 @@ public class PlayerRepositoryImpl implements PlayerRepository {
         }
     }
 
+    /**
+     * метод возращает игрока
+     *
+     * @param id ID игрока
+     * @return игрока
+     * @throws SQLException
+     */
     @Override
     public Player findById(long id) throws SQLException {
         Connection connection = null;
@@ -70,6 +86,14 @@ public class PlayerRepositoryImpl implements PlayerRepository {
         }
     }
 
+    /**
+     * метод возращает игрока
+     *
+     * @param name     имя игрока
+     * @param password пароль игрока
+     * @return игрока
+     * @throws SQLException
+     */
     @Override
     public Player findByNamePassword(String name, String password) throws SQLException {
         Connection connection = null;
@@ -101,6 +125,13 @@ public class PlayerRepositoryImpl implements PlayerRepository {
         }
     }
 
+    /**
+     * метод обновляет account игрока
+     *
+     * @param updatePlayer игрок с новым account
+     * @return игрока с обновленным account
+     * @throws SQLException
+     */
     @Override
     public Player update(Player updatePlayer) throws SQLException {
         Connection connection = null;

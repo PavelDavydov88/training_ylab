@@ -3,7 +3,6 @@ package repository;
 import config.DBConnectionProvider;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,12 +11,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * класс для хранения истории дебит/кредит
+ */
 @RequiredArgsConstructor
 public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
     private final DBConnectionProvider dbConnectionProvider;
     public static final String INSERT_HISTORY = "INSERT INTO wallet.\"history-credit-debit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_history'), ?, ?)";
     public static final String SELECT_FIND_HISTORY = "select * from wallet.\"history-credit-debit\" where \"id_player\" = ?";
 
+    /**
+     * метод сохраняет историю дебит/кредит игрока
+     *
+     * @param idPlayer    ID игрока
+     * @param historyText история дебит/кредит игрока
+     * @throws SQLException
+     */
     @Override
     public void save(long idPlayer, String historyText) throws SQLException {
         String historyWithDate = historyText + ", time = " + new Date();
@@ -37,6 +46,13 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
         }
     }
 
+    /**
+     * метод возращает истории дебит/кредит игрока
+     *
+     * @param id ID игрока
+     * @return список истории дебит/кредит игрока
+     * @throws SQLException
+     */
     @Override
     public List<String> findById(long id) throws SQLException {
         List<String> listHistory = new ArrayList<>();
@@ -56,7 +72,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
             return listHistory;
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }  finally {
+        } finally {
             connection.close();
             preparedStatement.close();
             resultSet.close();
