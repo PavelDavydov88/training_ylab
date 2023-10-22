@@ -3,7 +3,7 @@
 mvn compile
 ###чтобы запустить скомпилированный код, нужно в консоли из этой же директории написать:<br>
 ### после запуска программы в косоль будут выведены доступные команды<br>
-mvn exec:java -Dexec.mainClass="main"
+mvn exec:java -Dexec.mainClass="Main"
 ### пример<br>
 ####MENU<br>
 1: registration player<br>

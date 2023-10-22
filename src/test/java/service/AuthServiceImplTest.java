@@ -6,6 +6,8 @@ import repository.AuditRepository;
 import repository.AuthRepository;
 import repository.PlayerRepository;
 
+import java.sql.SQLException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -19,21 +21,17 @@ public class AuthServiceImplTest {
     AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
 
     @Test
-    public void testThatDoAuthorization() {
-        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(new Player("Pavel", "password", 1));
+    public void testThatDoAuthorization() throws SQLException {
+        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(new Player(1, "Pavel", "password", 0));
         String token = authService.doAuthorization("Pavel", "password");
         String player = authService.decodeJWT(token).getSubject();
         assertThat(player).isEqualTo("id=1, name=Pavel, account=0");
     }
 
     @Test
-    public void testThatFailAuthorization() {
+    public void testThatFailAuthorization() throws SQLException {
         when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(null);
         String wrongToken = authService.doAuthorization("wrongName", "wrongPassword");
         assertThat(wrongToken).isEqualTo("this player doesn't exist");
     }
-
-
-
-
 }

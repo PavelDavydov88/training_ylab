@@ -1,29 +1,86 @@
 package repository;
 
+
+import config.DBConnectionProvider;
+import lombok.RequiredArgsConstructor;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * класс для хранения audit
+ */
+@RequiredArgsConstructor
 public class AuditRepositoryImpl implements AuditRepository {
 
-    private static final Map<Long, List<String>> mapAudit = new ConcurrentHashMap<>();
+    private final DBConnectionProvider dbConnectionProvider;
+    public static final String INSERT_AUDIT = """
+            INSERT INTO wallet."audit" ("id", "id_player", "operation") 
+            VALUES (nextval( 'wallet.sequence_audit'), ?, ?)""";
+    public static final String SELECT_FIND_AUDIT = """
+            select * from wallet."audit" where "id_player" = ?""";
 
+    /**
+     * метод сохраняет действия игрока
+     *
+     * @param idPlayer    ID игрока
+     * @param historyText действия игрока
+     * @throws SQLException
+     */
     @Override
-    public String save(long idPlayer, String historyText) {
-        List<String> listAuditPlayer = mapAudit.get(idPlayer);
-        if (listAuditPlayer == null) {
-            listAuditPlayer = new ArrayList<>();
-        }
+    public void save(long idPlayer, String historyText) throws SQLException {
         String historyWithDate = historyText + ", time = " + new Date();
-        listAuditPlayer.add(historyWithDate);
-        mapAudit.put(idPlayer, listAuditPlayer);
-        return historyWithDate;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dbConnectionProvider.getConnection();
+            preparedStatement = connection.prepareStatement(INSERT_AUDIT);
+            preparedStatement.setLong(1, idPlayer);
+            preparedStatement.setString(2, historyWithDate);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+            preparedStatement.close();
+        }
     }
 
+    /**
+     * метод возращает все действия игрока
+     *
+     * @param id ID игрока
+     * @return список действий игрока
+     * @throws SQLException
+     */
     @Override
-    public List<String> findById(long idPlayer) {
-        return mapAudit.get(idPlayer);
+    public List<String> findAllById(long id) throws SQLException {
+        List<String> listHistory = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dbConnectionProvider.getConnection();
+            preparedStatement = connection.prepareStatement(SELECT_FIND_AUDIT);
+            preparedStatement.setLong(1, id);
+            resultSet = preparedStatement.executeQuery();
+            String operation;
+            while (resultSet.next()) {
+                operation = resultSet.getString("operation");
+                listHistory.add(operation);
+            }
+            return listHistory;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+            preparedStatement.close();
+            resultSet.close();
+        }
     }
 }

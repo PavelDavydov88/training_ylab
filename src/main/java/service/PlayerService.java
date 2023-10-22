@@ -1,20 +1,19 @@
 package service;
 
-import model.Player;
-
+import java.sql.SQLException;
 import java.util.List;
 
 public interface PlayerService {
 
-    long getAccount(String token);
+    long getAccount(String token) throws SQLException;
 
-    long debitAccount(String token, long valueDebitAccount, String transaction) throws Exception;
+    long debitAccount(String token, long valueDebitAccount, Long transaction) throws Exception;
 
-    long creditAccount(String token, long valueCreditAccount, String transaction) throws Exception;
+    long creditAccount(String token, long valueCreditAccount, Long transaction) throws Exception;
 
-    Player create(String name, String password);
+    void create(String name, String password) throws SQLException;
 
-    List<String> getListOperationAccount(String token);
+    List<String> getListOperationAccount(String token) throws SQLException;
 
-    List<String> getListAuditAction(String token);
+    List<String> getListAuditAction(String token) throws SQLException;
 }

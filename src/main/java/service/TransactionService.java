@@ -1,8 +1,10 @@
 package service;
 
+import java.sql.SQLException;
+
 public interface TransactionService {
 
-    String save(String transaction);
+    void save(Long idPlayer,Long transaction) throws SQLException;
 
-    boolean checkExist(String transaction);
+    boolean checkExist(Long transaction) throws SQLException;
 }

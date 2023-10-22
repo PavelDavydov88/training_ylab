@@ -1,21 +1,54 @@
-import model.Player;
+import config.DBConnectionProvider;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.DatabaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import repository.*;
 import service.*;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
-public class main {
-    public static void main(String[] args) {
+import static config.PropertyUtils.getProperty;
 
-        PlayerRepository playerRepository = new PlayerRepositoryImpl();
-        AuthRepository authRepository = new AuthRepositoryImpl();
-        TransactionRepository transactionRepository = new TransactionRepositoryImpl();
-        HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl();
-        AuditRepository auditRepository = new AuditRepositoryImpl();
+public class Main {
+    public static void main(String[] args) throws SQLException, IOException {
+        Connection connection = null;
+        Database database = null;
+        Statement statement = null;
+        DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
+        try {
+            connection = dbConnectionProvider.getConnection();
+            database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+            String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
+            statement = connection.createStatement();
+            statement.executeUpdate(sql);
+            database.setDefaultSchemaName("liquibase");
+            Liquibase liquibase = new Liquibase(getProperty("db.changeLog"), new ClassLoaderResourceAccessor(), database);
+            liquibase.update();
+            System.out.println("Миграции успешно выполнены!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            connection.close();
+            statement.close();
+        }
 
-        AuthService authService = new AuthServiceImpl(playerRepository,authRepository, auditRepository);
+        PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
+        AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
+        TransactionRepository transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
+        HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
+        AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
+
+        AuditService auditService = new AuditServiceImpl(auditRepository);
+        AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
         TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
-        PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditRepository);
+        PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
 
         Scanner input = new Scanner(System.in);
         int option;
@@ -30,8 +63,8 @@ public class main {
                     System.out.println("registration player, input Name, Password");
                     String name = input.next();
                     String password = input.next();
-                    Player player = playerService.create(name, password);
-                    System.out.println("player created : " + player);
+                    playerService.create(name, password);
+                    System.out.println("player created : ");
                     break;
                 }
                 case 2: {
@@ -52,7 +85,7 @@ public class main {
                     System.out.println("debit operation of the player, input your token,value of credit, ID transaction");
                     String token = input.next();
                     long valueDebit = input.nextLong();
-                    String transaction = input.next();
+                    Long transaction = Long.valueOf(input.next());
                     try {
                         System.out.println("your current account : " + playerService.debitAccount(token, valueDebit, transaction));
                     } catch (Exception e) {
@@ -64,7 +97,7 @@ public class main {
                     System.out.println("credit operation of the player, input your token, value of debit, ID transaction");
                     String token = input.next();
                     long valueCredit = input.nextLong();
-                    String transaction = input.next();
+                    Long transaction = Long.valueOf(input.next());
                     try {
                         System.out.println("your current account: " + playerService.creditAccount(token, valueCredit, transaction));
                     } catch (Exception e) {
@@ -91,9 +124,7 @@ public class main {
                     System.out.println("exit of authorization player done");
                     break;
                 }
-
             }
-
         }
     }
 

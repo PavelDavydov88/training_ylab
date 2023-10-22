@@ -1,38 +1,159 @@
 package repository;
 
+import config.DBConnectionProvider;
+import lombok.RequiredArgsConstructor;
 import model.Player;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+/**
+ * класс для хранения игрока
+ */
+@RequiredArgsConstructor
 public class PlayerRepositoryImpl implements PlayerRepository {
 
-    private static final AtomicLong idPlayer = new AtomicLong(0);
-    private static final Map<Long, Player> mapPlayers = new ConcurrentHashMap<>();
+    private final DBConnectionProvider dbConnectionProvider;
+    public static final String UPDATE_PLAYER = """
+            UPDATE wallet."player" SET account = ? WHERE id = ?""";
+    public static final String INSERT_PLAYER = """
+            INSERT INTO wallet."player" ("id", user_name, password, account) 
+            VALUES (nextval( 'wallet.sequence_player'), ?, ?, ?)""";
+    public static final String SELECT_FIND_BY_ID_PLAYER = """
+            select * from wallet."player" where id = ?""";
+    public static final String SELECT_FIND_BY_NAME_PASSWORD = """
+            select * from wallet."player" where user_name=? and "password"=?""";
 
+    /**
+     * метод сохраняет игрока
+     *
+     * @param inputPlayer данные игрока
+     * @throws SQLException
+     */
     @Override
-    public Player save(Player inputPlayer) {
-        Player newPlayer = new Player(inputPlayer.getName(), inputPlayer.getPassword(), idPlayer.incrementAndGet());
-        mapPlayers.put(newPlayer.getId(), newPlayer);
-        return newPlayer;
+    public void save(Player inputPlayer) throws SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dbConnectionProvider.getConnection();
+            preparedStatement = connection.prepareStatement(INSERT_PLAYER);
+            preparedStatement.setString(1, inputPlayer.getName());
+            preparedStatement.setString(2, inputPlayer.getPassword());
+            preparedStatement.setInt(3, 0);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+            preparedStatement.close();
+        }
     }
 
+    /**
+     * метод возращает игрока
+     *
+     * @param id ID игрока
+     * @return игрока
+     * @throws SQLException
+     */
     @Override
-    public Player findById(long id) {
+    public Player findById(long id) throws SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dbConnectionProvider.getConnection();
+            ;
+            preparedStatement = connection.prepareStatement(SELECT_FIND_BY_ID_PLAYER);
+            preparedStatement.setLong(1, id);
+            resultSet = preparedStatement.executeQuery();
+            String name = null, password = null;
+            long account = 0, idResult = 0;
+            if (resultSet.next()) {
+                idResult = resultSet.getLong("id");
+                name = resultSet.getString("user_name");
+                password = resultSet.getString("password");
+                account = resultSet.getLong("account");
 
-        return mapPlayers.get(id);
+            } else {
+                System.out.println("Record not found.");
+            }
+            return new Player(idResult, name, password, account);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+            preparedStatement.close();
+            resultSet.close();
+        }
     }
 
+    /**
+     * метод возращает игрока
+     *
+     * @param name     имя игрока
+     * @param password пароль игрока
+     * @return игрока
+     * @throws SQLException
+     */
     @Override
-    public Player findByNamePassword(String name, String password) {
-        return mapPlayers.values().stream().filter(a -> a.getName().equals(name) && a.getPassword().equals(password)).findFirst().orElse(null);
+    public Player findByNamePassword(String name, String password) throws SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dbConnectionProvider.getConnection();
+            preparedStatement = connection.prepareStatement(SELECT_FIND_BY_NAME_PASSWORD);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, password);
+            resultSet = preparedStatement.executeQuery();
+            String nameResult = null, passwordResult = null;
+            long accountResult = 0, idResult = 0;
+            if (resultSet.next()) {
+                idResult = resultSet.getLong("id");
+                nameResult = resultSet.getString("user_name");
+                passwordResult = resultSet.getString("password");
+                accountResult = resultSet.getLong("account");
+            } else {
+                System.out.println("Record not found.");
+            }
+            return new Player(idResult, nameResult, passwordResult, accountResult);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+            preparedStatement.close();
+            resultSet.close();
+        }
     }
 
+    /**
+     * метод обновляет account игрока
+     *
+     * @param updatePlayer игрок с новым account
+     * @return игрока с обновленным account
+     * @throws SQLException
+     */
     @Override
-    public Player update(Player updatePlayer) {
-        Player player = mapPlayers.get(updatePlayer.getId());
-        player.setAccount(updatePlayer.getAccount());
-        return player;
+    public Player update(Player updatePlayer) throws SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dbConnectionProvider.getConnection();
+            ;
+            preparedStatement = connection.prepareStatement(UPDATE_PLAYER);
+            preparedStatement.setLong(1, updatePlayer.getAccount());
+            preparedStatement.setLong(2, updatePlayer.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connection.close();
+            preparedStatement.close();
+        }
+        return findById(updatePlayer.getId());
     }
 }

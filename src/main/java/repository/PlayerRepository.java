@@ -2,14 +2,16 @@ package repository;
 
 import model.Player;
 
+import java.sql.SQLException;
+
 public interface PlayerRepository {
 
-    Player save(Player player);
+    void save(Player player) throws SQLException;
 
-    Player findById(long id);
+    Player findById(long id) throws SQLException;
 
-    Player update(Player player);
+    Player update(Player player) throws SQLException;
 
-    Player findByNamePassword(String name, String password);
+    Player findByNamePassword(String name, String password) throws SQLException;
 
 }
