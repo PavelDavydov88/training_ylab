@@ -26,7 +26,10 @@ public class PlayerRepositoryImplTest {
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     PlayerRepository playerRepository;
-    public static final String INSERT_PLAYER = "INSERT INTO wallet.\"player\" (\"id\", user_name, password, account) VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)";
+    public static final String INSERT_PLAYER = """
+            INSERT INTO wallet."player" ("id", user_name, password, account) 
+            VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)""";
+
     @Before
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());

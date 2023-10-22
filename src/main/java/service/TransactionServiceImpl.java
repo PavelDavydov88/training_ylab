@@ -21,7 +21,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws SQLException
      */
     @Override
-    public void save(Long idPlayer, String transaction) throws SQLException {
+    public void save(Long idPlayer, Long transaction) throws SQLException {
         if (!checkExist(transaction)) {
             transactionRepository.save(idPlayer, transaction);
         } else throw new SQLException("this transaction exist");
@@ -34,7 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @return true если номера транзакции существует, false если нет
      */
     @Override
-    public boolean checkExist(String transaction) throws SQLException {
+    public boolean checkExist(Long transaction) throws SQLException {
 
         return transactionRepository.find(transaction) != null;
     }

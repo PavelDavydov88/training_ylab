@@ -7,13 +7,13 @@
     <changeSet id="005-create-table-transaction" author="pavel">
         <createSequence sequenceName="SEQUENCE_TRANSACTION" incrementBy="1" cacheSize="1" maxValue="9223372036854775807" startValue="40" schemaName="wallet"/>
         <createTable tableName="transaction" schemaName="wallet">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" remarks="ID транзакции" defaultValueComputed="nextval('wallet.SEQUENCE_TRANSACTION')">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
-            <column name="id_player" type="BIGINT">
+            <column name="id_player" type="BIGINT" remarks="ID игрока">
                 <constraints nullable="false" unique="false"/>
             </column>
-            <column name="name_transaction" type="VARCHAR(255)">
+            <column name="transaction" type="BIGINT" remarks="номер транзакции">
                 <constraints nullable="false" unique="true"/>
             </column>
         </createTable>

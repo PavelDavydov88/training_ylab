@@ -20,14 +20,14 @@ public class TransactionServiceImplTest {
 
     @Test
     public void testThatSaveTransaction() throws SQLException {
-        transactionService.save(1L, "1");
-        verify(transactionRepository).save(anyLong(), anyString());
+        transactionService.save(1L, 1L);
+        verify(transactionRepository).save(anyLong(), anyLong());
     }
 
     @Test
     public void testThatTransactionExist() throws SQLException {
-        when(transactionRepository.find(anyString())).thenReturn("1");
-        assertThat(transactionService.checkExist("1")).isTrue();
+        when(transactionRepository.find(anyLong())).thenReturn(1L);
+        assertThat(transactionService.checkExist(1L)).isTrue();
 
     }
 }

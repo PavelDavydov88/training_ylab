@@ -3,6 +3,7 @@ package service;
 import io.jsonwebtoken.Claims;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 public interface AuthService {
     String doAuthorization(String name, String password) throws SQLException;
@@ -13,5 +14,5 @@ public interface AuthService {
 
     String createJWT(String id, String issuer, String subject, long ttlMillis);
 
-    String find(String token) throws SQLException;
+    Optional<String> find(String token) throws SQLException;
 }

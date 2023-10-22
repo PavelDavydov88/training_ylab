@@ -4,8 +4,8 @@ import java.sql.SQLException;
 
 public interface TransactionRepository {
 
-    void save(Long idPlayer, String transaction) throws SQLException;
+    void save(Long idPlayer, Long transaction) throws SQLException;
 
-    String find(String transaction) throws SQLException;
+    Long find(Long transaction) throws SQLException;
 
 }

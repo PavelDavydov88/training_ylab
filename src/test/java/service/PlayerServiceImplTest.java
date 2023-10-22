@@ -8,6 +8,7 @@ import repository.HistoryCreditDebitRepository;
 import repository.PlayerRepository;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -34,7 +35,7 @@ public class PlayerServiceImplTest {
 
     @Test
     public void testThatGetAccount() throws SQLException {
-        when(authRepository.find(anyString())).thenReturn("1");
+        when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
         when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
         String token = authService.doAuthorization("Pavel", "password");
@@ -44,25 +45,25 @@ public class PlayerServiceImplTest {
 
     @Test
     public void testThatFailDoDebit() throws SQLException {
-        when(authRepository.find(anyString())).thenReturn("1");
+        when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
         when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
         String token = authService.doAuthorization("Pavel", "password");
         Throwable throwable = catchThrowable(() -> {
-            playerService.debitAccount(token, 100, "1");
+            playerService.debitAccount(token, 100, 1L);
         });
         assertThat(throwable.getMessage()).isEqualTo("the player doesn't have enough money");
     }
 
     @Test
     public void testThatDoDebit() throws SQLException {
-        when(authRepository.find(anyString())).thenReturn("1");
+        when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
         when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
         when(playerRepository.update(any(Player.class))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
         String token = authService.doAuthorization("Pavel", "password");
         try {
-            long account = playerService.debitAccount(token, 0, "1");
+            long account = playerService.debitAccount(token, 0, 1L);
             assertThat(account).isEqualTo(0);
         } catch (Exception e) {
             e.printStackTrace();

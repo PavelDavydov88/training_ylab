@@ -24,7 +24,8 @@ public class AuthRepositoryImplTest {
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     AuthRepository authRepository;
-    public static final String INSERT_TOKEN = "INSERT INTO wallet.\"auth\" (\"id\" ,\"token\") VALUES (nextval( 'wallet.sequence_auth'), '1')";
+    public static final String INSERT_TOKEN = """
+            INSERT INTO wallet."auth" ("id" ,"token") VALUES (nextval( 'wallet.sequence_auth'), '1')""";
 
     @Before
     public void setUp() throws SQLException, LiquibaseException {
@@ -48,20 +49,20 @@ public class AuthRepositoryImplTest {
     @Test
     public void thatSaveToken() throws SQLException {
         authRepository.save("2");
-        String token = authRepository.find("2");
+        String token = String.valueOf(authRepository.find("2"));
         assertThat(token).isEqualTo("2");
     }
 
     @Test
     public void thatFindByToken() throws SQLException {
-        String token = authRepository.find("1");
+        String token = String.valueOf(authRepository.find("1"));
         assertThat(token).isEqualTo("1");
     }
 
     @Test
     public void thatDeleteToken() throws SQLException {
         authRepository.delete("1");
-        String token = authRepository.find("1");
+        String token = String.valueOf(authRepository.find("1"));
         assertThat(token).isNull();
     }
 }

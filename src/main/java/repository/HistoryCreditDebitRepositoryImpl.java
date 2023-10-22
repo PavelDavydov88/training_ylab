@@ -17,8 +17,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
     private final DBConnectionProvider dbConnectionProvider;
-    public static final String INSERT_HISTORY = "INSERT INTO wallet.\"history-credit-debit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_history'), ?, ?)";
-    public static final String SELECT_FIND_HISTORY = "select * from wallet.\"history-credit-debit\" where \"id_player\" = ?";
+    public static final String INSERT_HISTORY = """
+            INSERT INTO wallet."history-credit-debit" ("id", "id_player", "operation") VALUES (nextval( 'wallet.sequence_history'), ?, ?)""";
+    public static final String SELECT_FIND_HISTORY = """
+            select * from wallet."history-credit-debit" where "id_player" = ?""";
 
     /**
      * метод сохраняет историю дебит/кредит игрока

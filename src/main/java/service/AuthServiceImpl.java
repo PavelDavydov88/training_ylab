@@ -15,6 +15,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * класс предоставляет сервис по авторизации и завершения работы игрока
@@ -121,7 +122,7 @@ public class AuthServiceImpl implements AuthService {
      * @return токен
      */
     @Override
-    public String find(String token) throws SQLException {
+    public Optional<String> find(String token) throws SQLException {
         return authRepository.find(token);
     }
 

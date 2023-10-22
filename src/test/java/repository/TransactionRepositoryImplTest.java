@@ -25,44 +25,55 @@ public class TransactionRepositoryImplTest {
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     TransactionRepository transactionRepository;
-
-    public static final String INSERT_TRANSACTION = "INSERT INTO wallet.\"transaction\" (\"id\" , \"id_player\",\"name_transaction\") VALUES (nextval( 'wallet.sequence_transaction'), 10,'1')";
+    public static final String INSERT_TRANSACTION = """
+            INSERT INTO wallet."transaction" ("id" , "id_player","transaction") 
+            VALUES (nextval( 'wallet.sequence_transaction'), 10,'1')""";
 
     @Before
     public void setUp() throws SQLException, LiquibaseException {
-        DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
+        DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(
+                postgresContainer.getJdbcUrl(),
+                postgresContainer.getUsername(),
+                postgresContainer.getPassword());
         transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
         Connection connection = DriverManager
-                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
+                .getConnection(postgresContainer.getJdbcUrl(),
+                        postgresContainer.getUsername(),
+                        postgresContainer.getPassword());
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
         String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
         Statement statement = connection.createStatement();
         statement.executeUpdate(sql);
         database.setDefaultSchemaName("liquibase");
-        Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
+        Liquibase liquibase = new Liquibase(
+                "db/changelog/changelog.xml",
+                new ClassLoaderResourceAccessor(), database);
         liquibase.update();
         connection = DriverManager
-                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
+                .getConnection(
+                        postgresContainer.getJdbcUrl(),
+                        postgresContainer.getUsername(),
+                        postgresContainer.getPassword());
         statement = connection.createStatement();
         statement.executeUpdate(INSERT_TRANSACTION);
     }
 
     @Test
     public void testThatSaveTransaction() throws SQLException {
-        transactionRepository.save(1l,"2");
-        String transaction = transactionRepository.find("2");
-        assertThat(transaction).isEqualTo("2");
+        transactionRepository.save(1l, 2L);
+        Long transaction = transactionRepository.find(2L);
+        assertThat(transaction).isEqualTo(2L);
     }
 
     @Test
     public void thatFindByNameTransaction() throws SQLException {
-        String transaction = transactionRepository.find("1");
-        assertThat(transaction).isEqualTo("1");
+        Long transaction = transactionRepository.find(1L);
+        assertThat(transaction).isEqualTo(1L);
     }
 
     @Test
     public void thatFindByNameTransactionReturnNull() throws SQLException {
-        String transaction = transactionRepository.find("0");
+        Long transaction = transactionRepository.find(0L);
         assertThat(transaction).isNull();
     }
 }

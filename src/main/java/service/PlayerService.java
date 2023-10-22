@@ -7,9 +7,9 @@ public interface PlayerService {
 
     long getAccount(String token) throws SQLException;
 
-    long debitAccount(String token, long valueDebitAccount, String transaction) throws Exception;
+    long debitAccount(String token, long valueDebitAccount, Long transaction) throws Exception;
 
-    long creditAccount(String token, long valueCreditAccount, String transaction) throws Exception;
+    long creditAccount(String token, long valueCreditAccount, Long transaction) throws Exception;
 
     void create(String name, String password) throws SQLException;
 

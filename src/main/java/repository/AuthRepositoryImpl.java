@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 /**
  * класс для хранения auth
@@ -19,9 +20,12 @@ public class AuthRepositoryImpl implements AuthRepository {
 
     private final DBConnectionProvider dbConnectionProvider;
 
-    public static final String INSERT_TOKEN = "INSERT INTO wallet.\"auth\" (\"id\" ,\"token\") VALUES (nextval( 'wallet.sequence_auth'), ?)";
-    public static final String SELECT_FIND_TOKEN = "select * from wallet.\"auth\" where \"token\" = ?";
-    public static final String DELETE_TOKEN = "delete from wallet.\"auth\" where \"token\" = ?";
+    public static final String INSERT_TOKEN = """
+            INSERT INTO wallet."auth" ("id" ,"token") VALUES (nextval( 'wallet.sequence_auth'), ?)""";
+    public static final String SELECT_FIND_TOKEN = """
+            select * from wallet."auth" where "token" = ?""";
+    public static final String DELETE_TOKEN = """
+            delete from wallet."auth" where "token" = ?""";
 
     /**
      * метод сохраняет токен
@@ -54,7 +58,7 @@ public class AuthRepositoryImpl implements AuthRepository {
      * @throws SQLException
      */
     @Override
-    public String find(String token) throws SQLException {
+    public Optional<String> find(String token) throws SQLException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -64,9 +68,9 @@ public class AuthRepositoryImpl implements AuthRepository {
             preparedStatement.setString(1, token);
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getString("token");
+                return Optional.of(resultSet.getString("token"));
             } else {
-                return null;
+                return Optional.empty();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

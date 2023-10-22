@@ -30,7 +30,7 @@ public class PlayerServiceImpl implements PlayerService {
      */
     @Override
     public long getAccount(String token) throws SQLException {
-        if (authService.find(token) == null) {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
             return 0;
         }
@@ -56,7 +56,7 @@ public class PlayerServiceImpl implements PlayerService {
      *                   или невалидной транзакции
      */
     @Override
-    public long debitAccount(String token, long valueDebitAccount, String transaction) throws Exception {
+    public long debitAccount(String token, long valueDebitAccount, Long transaction) throws Exception {
         if (authService.find(token) == null) {
             log.info("invalid token");
             return 0;
@@ -90,7 +90,7 @@ public class PlayerServiceImpl implements PlayerService {
      * @throws Exception в случае невалидной транзакции
      */
     @Override
-    public long creditAccount(String token, long valueCreditAccount, String transaction) throws Exception {
+    public long creditAccount(String token, long valueCreditAccount, Long transaction) throws Exception {
 
         if (authService.find(token) == null) {
             log.info("invalid token");

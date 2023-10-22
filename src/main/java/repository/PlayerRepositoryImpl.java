@@ -16,10 +16,15 @@ import java.sql.SQLException;
 public class PlayerRepositoryImpl implements PlayerRepository {
 
     private final DBConnectionProvider dbConnectionProvider;
-    public static final String UPDATE_PLAYER = "UPDATE wallet.\"player\" SET account = ? WHERE id = ?";
-    public static final String INSERT_PLAYER = "INSERT INTO wallet.\"player\" (\"id\", user_name, password, account) VALUES (nextval( 'wallet.sequence_player'), ?, ?, ?)";
-    public static final String SELECT_FIND_BY_ID_PLAYER = "select * from wallet.\"player\" where id = ?";
-    public static final String SELECT_FIND_BY_NAME_PASSWORD = "select * from wallet.\"player\" where user_name=? and \"password\"=?";
+    public static final String UPDATE_PLAYER = """
+            UPDATE wallet."player" SET account = ? WHERE id = ?""";
+    public static final String INSERT_PLAYER = """
+            INSERT INTO wallet."player" ("id", user_name, password, account) 
+            VALUES (nextval( 'wallet.sequence_player'), ?, ?, ?)""";
+    public static final String SELECT_FIND_BY_ID_PLAYER = """
+            select * from wallet."player" where id = ?""";
+    public static final String SELECT_FIND_BY_NAME_PASSWORD = """
+            select * from wallet."player" where user_name=? and "password"=?""";
 
     /**
      * метод сохраняет игрока

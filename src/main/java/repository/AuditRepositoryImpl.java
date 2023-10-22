@@ -19,8 +19,11 @@ import java.util.List;
 public class AuditRepositoryImpl implements AuditRepository {
 
     private final DBConnectionProvider dbConnectionProvider;
-    public static final String INSERT_AUDIT = "INSERT INTO wallet.\"audit\" (\"id\", \"id_player\", \"operation\") VALUES (nextval( 'wallet.sequence_audit'), ?, ?)";
-    public static final String SELECT_FIND_AUDIT = "select * from wallet.\"audit\" where \"id_player\" = ?";
+    public static final String INSERT_AUDIT = """
+            INSERT INTO wallet."audit" ("id", "id_player", "operation") 
+            VALUES (nextval( 'wallet.sequence_audit'), ?, ?)""";
+    public static final String SELECT_FIND_AUDIT = """
+            select * from wallet."audit" where "id_player" = ?""";
 
     /**
      * метод сохраняет действия игрока

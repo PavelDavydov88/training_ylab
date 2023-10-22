@@ -17,7 +17,7 @@ import java.util.Scanner;
 import static config.PropertyUtils.getProperty;
 
 public class Main {
-    public static void main(String[] args) throws SQLException, DatabaseException, IOException {
+    public static void main(String[] args) throws SQLException, IOException {
         Connection connection = null;
         Database database = null;
         Statement statement = null;
@@ -29,11 +29,14 @@ public class Main {
             statement = connection.createStatement();
             statement.executeUpdate(sql);
             database.setDefaultSchemaName("liquibase");
-            Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
+            Liquibase liquibase = new Liquibase(getProperty("db.changeLog"), new ClassLoaderResourceAccessor(), database);
             liquibase.update();
             System.out.println("Миграции успешно выполнены!");
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            connection.close();
+            statement.close();
         }
 
         PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
@@ -55,10 +58,6 @@ public class Main {
             option = input.nextInt();
             switch (option) {
                 case 0:
-                    connection.close();
-                    database.close();
-                    statement.close();
-                    System.out.println("connection from main close=" + connection.isClosed());
                     System.exit(0);
                 case 1: {
                     System.out.println("registration player, input Name, Password");
@@ -86,7 +85,7 @@ public class Main {
                     System.out.println("debit operation of the player, input your token,value of credit, ID transaction");
                     String token = input.next();
                     long valueDebit = input.nextLong();
-                    String transaction = input.next();
+                    Long transaction = Long.valueOf(input.next());
                     try {
                         System.out.println("your current account : " + playerService.debitAccount(token, valueDebit, transaction));
                     } catch (Exception e) {
@@ -98,7 +97,7 @@ public class Main {
                     System.out.println("credit operation of the player, input your token, value of debit, ID transaction");
                     String token = input.next();
                     long valueCredit = input.nextLong();
-                    String transaction = input.next();
+                    Long transaction = Long.valueOf(input.next());
                     try {
                         System.out.println("your current account: " + playerService.creditAccount(token, valueCredit, transaction));
                     } catch (Exception e) {

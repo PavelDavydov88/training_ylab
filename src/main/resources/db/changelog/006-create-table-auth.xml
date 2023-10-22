@@ -7,10 +7,10 @@
     <changeSet id="006-create-table-auth" author="pavel">
         <createSequence sequenceName="SEQUENCE_AUTH" incrementBy="1" cacheSize="1" maxValue="9223372036854775807" startValue="50" schemaName="wallet"/>
         <createTable tableName="auth" schemaName="wallet">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" remarks="ID auth" defaultValueComputed="nextval('wallet.SEQUENCE_AUTH')">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
-            <column name="token" type="VARCHAR(255)"/>
+            <column name="token" type="VARCHAR(255)" remarks="имя токена"/>
         </createTable>
 
     </changeSet>
