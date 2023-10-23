@@ -49,7 +49,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
     }
 
     /**
-     * метод возращает истории дебит/кредит игрока
+     * Метод возвращает истории дебит/кредит игрока
      *
      * @param id ID игрока
      * @return список истории дебит/кредит игрока

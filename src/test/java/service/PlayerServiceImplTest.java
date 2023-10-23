@@ -1,6 +1,7 @@
 package service;
 
 import model.Player;
+import model.PlayerDTO;
 import org.junit.Test;
 import repository.AuditRepository;
 import repository.AuthRepository;
@@ -29,7 +30,7 @@ public class PlayerServiceImplTest {
     @Test
     public void testThatDoneCreate() throws SQLException {
         when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
-        playerService.create("Pavel", "password");
+        playerService.create(new PlayerDTO("Pavel", "password"));
         verify(playerRepository).save(any(Player.class));
     }
 

@@ -51,7 +51,7 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     /**
-     * метод возращает токен
+     * Метод возвращает токен
      *
      * @param token токен
      * @return

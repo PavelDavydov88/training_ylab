@@ -52,7 +52,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
     }
 
     /**
-     * метод возращает игрока
+     * Метод возвращает игрока
      *
      * @param id ID игрока
      * @return игрока
@@ -92,7 +92,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
     }
 
     /**
-     * метод возращает игрока
+     * Метод возвращает игрока
      *
      * @param name     имя игрока
      * @param password пароль игрока

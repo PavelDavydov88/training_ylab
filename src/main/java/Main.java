@@ -3,8 +3,8 @@ import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import model.PlayerDTO;
 import repository.*;
 import service.*;
 
@@ -63,7 +63,7 @@ public class Main {
                     System.out.println("registration player, input Name, Password");
                     String name = input.next();
                     String password = input.next();
-                    playerService.create(name, password);
+                    playerService.create(new PlayerDTO(name, password));
                     System.out.println("player created : ");
                     break;
                 }

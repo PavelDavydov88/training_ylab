@@ -26,7 +26,7 @@ public class TransactionRepositoryImplTest {
 
     TransactionRepository transactionRepository;
     public static final String INSERT_TRANSACTION = """
-            INSERT INTO wallet."transaction" ("id" , "id_player","transaction") 
+            INSERT INTO wallet."transaction" ("id" , "id_player","transaction")
             VALUES (nextval( 'wallet.sequence_transaction'), 10,'1')""";
 
     @Before

@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,20 +50,20 @@ public class AuthRepositoryImplTest {
     @Test
     public void thatSaveToken() throws SQLException {
         authRepository.save("2");
-        String token = String.valueOf(authRepository.find("2"));
-        assertThat(token).isEqualTo("2");
+        Optional<String> token = authRepository.find("2");
+        assertThat(token.get()).isEqualTo("2");
     }
 
     @Test
     public void thatFindByToken() throws SQLException {
-        String token = String.valueOf(authRepository.find("1"));
-        assertThat(token).isEqualTo("1");
+        Optional<String> token = authRepository.find("1");
+        assertThat(token.get()).isEqualTo("1");
     }
 
     @Test
     public void thatDeleteToken() throws SQLException {
         authRepository.delete("1");
-        String token = String.valueOf(authRepository.find("1"));
-        assertThat(token).isNull();
+        Optional<String> token = authRepository.find("1");
+        assertThat(token).isEmpty();
     }
 }

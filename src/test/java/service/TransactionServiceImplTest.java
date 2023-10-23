@@ -20,6 +20,7 @@ public class TransactionServiceImplTest {
 
     @Test
     public void testThatSaveTransaction() throws SQLException {
+        when(transactionRepository.find(anyLong())).thenReturn(null);
         transactionService.save(1L, 1L);
         verify(transactionRepository).save(anyLong(), anyLong());
     }

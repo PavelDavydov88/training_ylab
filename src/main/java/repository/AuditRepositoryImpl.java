@@ -52,7 +52,7 @@ public class AuditRepositoryImpl implements AuditRepository {
     }
 
     /**
-     * метод возращает все действия игрока
+     * Метод возвращает все действия игрока
      *
      * @param id ID игрока
      * @return список действий игрока

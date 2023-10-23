@@ -27,7 +27,7 @@ public class PlayerRepositoryImplTest {
 
     PlayerRepository playerRepository;
     public static final String INSERT_PLAYER = """
-            INSERT INTO wallet."player" ("id", user_name, password, account) 
+            INSERT INTO wallet."player" ("id", user_name, password, account)
             VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)""";
 
     @Before

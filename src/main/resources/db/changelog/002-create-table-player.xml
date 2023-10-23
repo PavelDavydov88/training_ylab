@@ -10,7 +10,9 @@
             <column name="id" type="BIGINT" remarks="ID игрока" defaultValueComputed="nextval('wallet.SEQUENCE_PLAYER')">
                 <constraints primaryKey="true" nullable="false" unique="true" />
             </column>
-            <column name="user_name" type="VARCHAR(255)" remarks="Имя игрока"/>
+            <column name="user_name" type="VARCHAR(255)" remarks="Имя игрока">
+                <constraints unique="true" />
+            </column>
             <column name="password" type="VARCHAR(255)" remarks="Пароль игрока"/>
             <column name="account" type="BIGINT" remarks="Счет игрока"/>
         </createTable>

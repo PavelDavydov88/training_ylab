@@ -3,6 +3,8 @@ package service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import model.Player;
+import model.PlayerDTO;
+import model.mapper.PlayerMapper;
 import repository.HistoryCreditDebitRepository;
 import repository.PlayerRepository;
 
@@ -113,19 +115,17 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * метод создания игрока
      *
-     * @param name     имя
-     * @param password пароль
-     * @throws SQLException
+     * @param dto@throws SQLException
      */
     @Override
-    public void create(String name, String password) throws SQLException {
-        Player inputPlayer = new Player(0, name, password, 0);
+    public void create(PlayerDTO dto) throws SQLException {
+        Player inputPlayer = PlayerMapper.INSTANCE.toModel(dto);
         try {
             playerRepository.save(inputPlayer);
-            Player player = playerRepository.findByNamePassword(name, password);
+            Player player = playerRepository.findByNamePassword(inputPlayer.getName(), inputPlayer.getPassword());
             auditService.sendEvent(player.getId(), "registration completed successful");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e);
         }
     }
 

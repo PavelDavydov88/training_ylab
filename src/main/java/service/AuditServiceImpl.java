@@ -24,7 +24,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     /**
-     * метод возращает список событий игрока
+     * Метод возвращает список событий игрока
      *
      * @param playerId ID игрока
      * @return коллекция событий
