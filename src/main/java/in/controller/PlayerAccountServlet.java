@@ -6,39 +6,42 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.PlayerDTO;
 import repository.*;
-import service.AuthService;
-import service.AuthServiceImpl;
+import service.*;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static config.PropertyUtils.getProperty;
 
-@WebServlet("/auth")
-public class AuthServlet extends HttpServlet {
+@WebServlet("/player/account")
+public class PlayerAccountServlet extends HttpServlet {
 
     DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
     PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
     AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
+    TransactionRepository transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
+    HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
+
+    AuditService auditService = new AuditServiceImpl(auditRepository);
     AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
+    TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
+    PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public AuthServlet() throws IOException {
+    public PlayerAccountServlet() throws IOException {
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        PlayerDTO playerDTO = objectMapper.readValue(req.getInputStream(), PlayerDTO.class);
+        String token = req.getHeader("token");
         try {
-            Optional<String> token = authService.doAuthorization(playerDTO);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
+            Long accountPlayer = playerService.getAccount(token);
+            resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("text/html");
-            resp.getOutputStream().write(token.get().getBytes());
+            resp.getOutputStream().write(objectMapper.writeValueAsBytes(accountPlayer));
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             resp.setContentType("text/html");
             resp.getOutputStream().write(e.getMessage().getBytes());
             e.printStackTrace();

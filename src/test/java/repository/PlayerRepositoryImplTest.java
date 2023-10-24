@@ -8,6 +8,7 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import model.Player;
+import model.PlayerDTO;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,9 +52,9 @@ public class PlayerRepositoryImplTest {
 
     @Test
     public void thatSavePlayer() throws SQLException {
-        Player defaultPlayer = getDefaultPlayer();
-        playerRepository.save(defaultPlayer);
-        Player player = playerRepository.findByNamePassword(defaultPlayer.getName(), defaultPlayer.getPassword());
+        Player getDefaultPlayer = getDefaultPlayer();
+        playerRepository.save(getDefaultPlayer);
+        Player player = playerRepository.findByNamePassword(getDefaultPlayerDto());
         assertThat(player.getId()).isEqualTo(11);
         assertThat(player.getName()).isEqualTo("Ivan");
     }
@@ -66,5 +67,9 @@ public class PlayerRepositoryImplTest {
 
     private Player getDefaultPlayer() {
         return new Player(0, "Ivan", "789", 0);
+    }
+
+    private PlayerDTO getDefaultPlayerDto() {
+        return new PlayerDTO("Ivan", "789");
     }
 }

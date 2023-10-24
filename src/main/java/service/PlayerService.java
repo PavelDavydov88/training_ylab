@@ -1,5 +1,6 @@
 package service;
 
+import model.AccountOperationDTO;
 import model.PlayerDTO;
 
 import java.sql.SQLException;
@@ -9,9 +10,9 @@ public interface PlayerService {
 
     long getAccount(String token) throws SQLException;
 
-    long debitAccount(String token, long valueDebitAccount, Long transaction) throws Exception;
+    long debitAccount(String token, AccountOperationDTO dto) throws Exception;
 
-    long creditAccount(String token, long valueCreditAccount, Long transaction) throws Exception;
+    long creditAccount(String token, AccountOperationDTO dto) throws Exception;
 
     void create(PlayerDTO dto) throws SQLException;
 

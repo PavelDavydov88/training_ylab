@@ -3,6 +3,7 @@ package repository;
 import config.DBConnectionProvider;
 import lombok.RequiredArgsConstructor;
 import model.Player;
+import model.PlayerDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -94,21 +95,19 @@ public class PlayerRepositoryImpl implements PlayerRepository {
     /**
      * Метод возвращает игрока
      *
-     * @param name     имя игрока
-     * @param password пароль игрока
-     * @return игрока
+     * @param dto@return игрока
      * @throws SQLException
      */
     @Override
-    public Player findByNamePassword(String name, String password) throws SQLException {
+    public Player findByNamePassword(PlayerDTO dto) throws SQLException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
             connection = dbConnectionProvider.getConnection();
             preparedStatement = connection.prepareStatement(SELECT_FIND_BY_NAME_PASSWORD);
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, password);
+            preparedStatement.setString(1, dto.getName());
+            preparedStatement.setString(2, dto.getPassword());
             resultSet = preparedStatement.executeQuery();
             String nameResult = null, passwordResult = null;
             long accountResult = 0, idResult = 0;
@@ -118,11 +117,11 @@ public class PlayerRepositoryImpl implements PlayerRepository {
                 passwordResult = resultSet.getString("password");
                 accountResult = resultSet.getLong("account");
             } else {
-                System.out.println("Record not found.");
+               throw new SQLException("this player doesn't exist");
             }
             return new Player(idResult, nameResult, passwordResult, accountResult);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e.getMessage());
         } finally {
             connection.close();
             preparedStatement.close();

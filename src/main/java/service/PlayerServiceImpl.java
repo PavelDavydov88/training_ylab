@@ -2,6 +2,7 @@ package service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import model.AccountOperationDTO;
 import model.Player;
 import model.PlayerDTO;
 import model.mapper.PlayerMapper;
@@ -34,7 +35,7 @@ public class PlayerServiceImpl implements PlayerService {
     public long getAccount(String token) throws SQLException {
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return 0;
+            throw new RuntimeException("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
         Player player = null;
@@ -50,33 +51,32 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * метод для выполнения операции debit
      *
-     * @param token             токен игрока
-     * @param valueDebitAccount значение списания со счета игрока
-     * @param transaction       уникальный номер транзакции
+     * @param token токен игрока
+     * @param dto
      * @return возращает счета игрока
      * @throws Exception в случае значение списания больше значения счета,
      *                   или невалидной транзакции
      */
     @Override
-    public long debitAccount(String token, long valueDebitAccount, Long transaction) throws Exception {
-        if (authService.find(token) == null) {
+    public long debitAccount(String token, AccountOperationDTO dto) throws Exception {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return 0;
+            throw new Exception("invalid token");
         }
         long id = Long.parseLong(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
 
-        if (transactionService.checkExist(transaction)) {
+        if (transactionService.checkExist(dto.getTransaction())) {
             auditService.sendEvent(player.getId(), "debit operation have not been done, this transaction is exist");
-            throw new Exception(transaction + " this transaction is exist");
+            throw new Exception(dto.getTransaction() + " this transaction is exist");
         }
-        transactionService.save(id, transaction);
-        if (player.getAccount() < valueDebitAccount) {
+        transactionService.save(id, dto.getTransaction());
+        if (player.getAccount() < dto.getValueOperation()) {
             auditService.sendEvent(player.getId(), "debit operation have not been done, the player doesn't have enough money");
             throw new Exception("the player doesn't have enough money");
         }
-        player.setAccount(player.getAccount() - valueDebitAccount);
-        historyCreditDebitRepository.save(player.getId(), "debit account - " + valueDebitAccount);
+        player.setAccount(player.getAccount() - dto.getValueOperation());
+        historyCreditDebitRepository.save(player.getId(), "debit account - " + dto.getValueOperation());
         auditService.sendEvent(player.getId(), "debit operation completed");
         player = playerRepository.update(player);
         return player.getAccount();
@@ -85,28 +85,27 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * метод для выполнения операции credit
      *
-     * @param token              токен игрока
-     * @param valueCreditAccount значение списания со счета игрока
-     * @param transaction        уникальный номер транзакции
+     * @param token токен игрока
+     * @param dto
      * @return возращает счета игрока
      * @throws Exception в случае невалидной транзакции
      */
     @Override
-    public long creditAccount(String token, long valueCreditAccount, Long transaction) throws Exception {
+    public long creditAccount(String token, AccountOperationDTO dto) throws Exception {
 
-        if (authService.find(token) == null) {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return 0;
+            throw new Exception("invalid token");
         }
         long id = Long.parseLong(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
-        if (transactionService.checkExist(transaction)) {
+        if (transactionService.checkExist(dto.getTransaction())) {
             auditService.sendEvent(player.getId(), "credit operation have not been done, this transaction is exist");
-            throw new Exception(transaction + " this transaction is exist");
+            throw new Exception(dto.getTransaction() + " this transaction is exist");
         }
-        transactionService.save(id, transaction);
-        player.setAccount(player.getAccount() + valueCreditAccount);
-        historyCreditDebitRepository.save(player.getId(), "credit account + " + valueCreditAccount);
+        transactionService.save(id, dto.getTransaction());
+        player.setAccount(player.getAccount() + dto.getValueOperation());
+        historyCreditDebitRepository.save(player.getId(), "credit account + " + dto.getValueOperation());
         auditService.sendEvent(player.getId(), "credit operation completed");
         player = playerRepository.update(player);
         return player.getAccount();
@@ -119,10 +118,11 @@ public class PlayerServiceImpl implements PlayerService {
      */
     @Override
     public void create(PlayerDTO dto) throws SQLException {
-        Player inputPlayer = PlayerMapper.INSTANCE.toModel(dto);
+//        Player inputPlayer = PlayerMapper.INSTANCE.toModel(dto);
         try {
-            playerRepository.save(inputPlayer);
-            Player player = playerRepository.findByNamePassword(inputPlayer.getName(), inputPlayer.getPassword());
+            Player playerInput = PlayerMapper.INSTANCE.toModel(dto);
+            playerRepository.save(playerInput);
+            Player player = playerRepository.findByNamePassword(dto);
             auditService.sendEvent(player.getId(), "registration completed successful");
         } catch (SQLException e) {
             throw new SQLException(e);

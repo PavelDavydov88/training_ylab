@@ -1,5 +1,6 @@
 package service;
 
+import model.AccountOperationDTO;
 import model.Player;
 import model.PlayerDTO;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class PlayerServiceImplTest {
 
     @Test
     public void testThatDoneCreate() throws SQLException {
-        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
+        when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         playerService.create(new PlayerDTO("Pavel", "password"));
         verify(playerRepository).save(any(Player.class));
     }
@@ -37,21 +38,21 @@ public class PlayerServiceImplTest {
     @Test
     public void testThatGetAccount() throws SQLException {
         when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
-        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
+        when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
-        String token = authService.doAuthorization("Pavel", "password");
-        long account = playerService.getAccount(token);
+        Optional<String> token = authService.doAuthorization(new PlayerDTO("Pavel", "password"));
+        long account = playerService.getAccount(token.get());
         assertThat(account).isEqualTo(0);
     }
 
     @Test
     public void testThatFailDoDebit() throws SQLException {
         when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
-        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
+        when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
-        String token = authService.doAuthorization("Pavel", "password");
+        Optional<String> token = authService.doAuthorization(new PlayerDTO("Pavel", "password"));
         Throwable throwable = catchThrowable(() -> {
-            playerService.debitAccount(token, 100, 1L);
+            playerService.debitAccount(token.get(),new AccountOperationDTO(1L, 100L));
         });
         assertThat(throwable.getMessage()).isEqualTo("the player doesn't have enough money");
     }
@@ -59,12 +60,12 @@ public class PlayerServiceImplTest {
     @Test
     public void testThatDoDebit() throws SQLException {
         when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
-        when(playerRepository.findByNamePassword("Pavel", "password")).thenReturn(createDefaultPlayer());
+        when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         when(playerRepository.update(any(Player.class))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
-        String token = authService.doAuthorization("Pavel", "password");
+        Optional<String> token = authService.doAuthorization(new PlayerDTO("Pavel", "password"));
         try {
-            long account = playerService.debitAccount(token, 0, 1L);
+            long account = playerService.debitAccount(token.get(), createDefaultOperationDTO());
             assertThat(account).isEqualTo(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,5 +74,8 @@ public class PlayerServiceImplTest {
 
     Player createDefaultPlayer() {
         return new Player(1, "Pavel", "password", 0);
+    }
+    AccountOperationDTO createDefaultOperationDTO() {
+        return new AccountOperationDTO( 1L,1L);
     }
 }

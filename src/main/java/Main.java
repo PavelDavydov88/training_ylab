@@ -67,44 +67,44 @@ public class Main {
                     System.out.println("player created : ");
                     break;
                 }
-                case 2: {
-                    System.out.println("authorization player, input Name, Password");
-                    String name = input.next();
-                    String password = input.next();
-                    String token = authService.doAuthorization(name, password);
-                    System.out.println("your token : " + token);
-                    break;
-                }
+//                case 2: {
+//                    System.out.println("authorization player, input Name, Password");
+//                    String name = input.next();
+//                    String password = input.next();
+//                    String token = authService.doAuthorization(name);
+//                    System.out.println("your token : " + token);
+//                    break;
+//                }
                 case 3: {
                     System.out.println("current account of the player, input your token");
                     String token = input.next();
                     System.out.println("your current account : " + playerService.getAccount(token));
                     break;
                 }
-                case 4: {
-                    System.out.println("debit operation of the player, input your token,value of credit, ID transaction");
-                    String token = input.next();
-                    long valueDebit = input.nextLong();
-                    Long transaction = Long.valueOf(input.next());
-                    try {
-                        System.out.println("your current account : " + playerService.debitAccount(token, valueDebit, transaction));
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-                }
-                case 5: {
-                    System.out.println("credit operation of the player, input your token, value of debit, ID transaction");
-                    String token = input.next();
-                    long valueCredit = input.nextLong();
-                    Long transaction = Long.valueOf(input.next());
-                    try {
-                        System.out.println("your current account: " + playerService.creditAccount(token, valueCredit, transaction));
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-                }
+//                case 4: {
+//                    System.out.println("debit operation of the player, input your token,value of credit, ID transaction");
+//                    String token = input.next();
+//                    long valueDebit = input.nextLong();
+//                    Long transaction = Long.valueOf(input.next());
+//                    try {
+//                        System.out.println("your current account : " + playerService.debitAccount(token, , valueDebit));
+//                    } catch (Exception e) {
+//                        System.out.println(e.getMessage());
+//                    }
+//                    break;
+//                }
+//                case 5: {
+//                    System.out.println("credit operation of the player, input your token, value of debit, ID transaction");
+//                    String token = input.next();
+//                    long valueCredit = input.nextLong();
+//                    Long transaction = Long.valueOf(input.next());
+//                    try {
+//                        System.out.println("your current account: " + playerService.creditAccount(token, , valueCredit));
+//                    } catch (Exception e) {
+//                        System.out.println(e.getMessage());
+//                    }
+//                    break;
+//                }
                 case 6: {
                     System.out.println("listing of the history debit/credit operation of the player, input your token");
                     String token = input.next();

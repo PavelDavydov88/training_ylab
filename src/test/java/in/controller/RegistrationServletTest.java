@@ -1,7 +1,6 @@
 package in.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,17 +14,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import service.PlayerService;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.IOException;
+import java.sql.SQLException;
 
 import static org.mockito.Mockito.*;
 
 public class RegistrationServletTest {
     @Mock
     PlayerService playerService;
-
-    @InjectMocks
-    RegistrationServlet registrationServlet;
 
     @Mock
     private HttpServletRequest request;
@@ -36,34 +32,42 @@ public class RegistrationServletTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private RequestDispatcher requestDispatcher;
-
-    private StringWriter stringWriter;
-    private PrintWriter printWriter;
-    @Mock
     ServletOutputStream outputStream;
+
+    @InjectMocks
+    RegistrationServlet registrationServlet;
 
     @SneakyThrows
     @BeforeEach
     void setUp() {
-
-
         MockitoAnnotations.openMocks(this);
-//        stringWriter = new StringWriter();
-//        printWriter = new PrintWriter(stringWriter);
         when(response.getOutputStream()).thenReturn(outputStream);
-//        when(outputStream.wr)
     }
 
     @SneakyThrows
     @Test
-    void doPost() {
-        ServletInputStream inputStream = mock(ServletInputStream.class);
+    void thatDonePost() {
         PlayerDTO playerDTO = new PlayerDTO();
-
-        when(objectMapper.readValue(any(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
-
+        when(objectMapper.readValue(nullable(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
         registrationServlet.doPost(request, response);
-        verify(playerService).create(any());
+        verify(playerService).create(playerDTO);
+        verify(outputStream).write("Player created!".getBytes());
+        verify(response).setStatus(HttpServletResponse.SC_CREATED);
+//        ServletInputStream inputStream = mock(ServletInputStream.class);
+//        when(objectMapper.readValue(any(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
+//        registrationServlet.doPost(request, response);
+//        verify(playerService).create(any());
     }
+
+    @Test
+    void testShouldThrowException() throws IOException, SQLException {
+        PlayerDTO playerDTO = new PlayerDTO();
+        when(objectMapper.readValue(nullable(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
+        String testMessage = "test message";
+        doThrow(new SQLException(testMessage)).when(playerService).create(playerDTO);
+        registrationServlet.doPost(request, response);
+        verify(outputStream).write(testMessage.getBytes());
+        verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
 }

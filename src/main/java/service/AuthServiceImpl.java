@@ -4,8 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import liquibase.sql.Sql;
 import lombok.RequiredArgsConstructor;
 import model.Player;
+import model.PlayerDTO;
 import repository.AuditRepository;
 import repository.AuthRepository;
 import repository.PlayerRepository;
@@ -30,28 +32,26 @@ public class AuthServiceImpl implements AuthService {
     /**
      * метод авторизации игрока
      *
-     * @param name     имя игрока
-     * @param password пароль игрока
-     * @return токен
+     * @param dto@return токен
      */
     @Override
-    public String doAuthorization(String name, String password) throws SQLException {
+    public Optional<String> doAuthorization(PlayerDTO dto) throws SQLException {
 
         Player player = null;
         try {
-            player = playerRepository.findByNamePassword(name, password);
+            player = playerRepository.findByNamePassword(dto);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e.getMessage());
         }
 
-        if (player == null) {
-            return "this player doesn't exist";
-        } else {
+//        if (player == null) {
+//            return new SQLException ("this player doesn't exist");
+//        } else {
             String token = createJWT(String.valueOf(player.getId()), "test", player.toString(), System.currentTimeMillis());
             authRepository.save(token);
             auditRepository.save(player.getId(), "authorization completed successful");
-            return token;
-        }
+            return Optional.of(token);
+//        }
     }
 
     /**

@@ -1,7 +1,6 @@
 package in.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import config.DBConnectionProvider;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,7 +26,6 @@ import static config.PropertyUtils.getProperty;
 @WebServlet("/registration")
 public class RegistrationServlet extends HttpServlet {
 
-
     DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
     PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
     AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
@@ -39,17 +37,10 @@ public class RegistrationServlet extends HttpServlet {
     AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
-
-
     ObjectMapper objectMapper = new ObjectMapper();
 
     public RegistrationServlet() throws IOException {
     }
-
-//    public RegistrationServlet() throws IOException {
-//        this.objectMapper = new ObjectMapper();
-//        this.objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-//    }
 
     @SneakyThrows
     @Override
@@ -87,15 +78,12 @@ public class RegistrationServlet extends HttpServlet {
             playerService.create(playerDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setContentType("text/html");
-            resp.getOutputStream().write(objectMapper.writeValueAsBytes("the player created"));
-//            resp.setContentType("application/json");
-//            resp.getOutputStream().write(objectMapper.writeValueAsBytes(playerDTO));
+            resp.getOutputStream().write("Player created!".getBytes());
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.setContentType("text/html");
-            resp.getOutputStream().write(objectMapper.writeValueAsBytes(e.getMessage()));
+            resp.getOutputStream().write(e.getMessage().getBytes());
             e.printStackTrace();
         }
     }
-
 }
