@@ -31,7 +31,7 @@ public class AuditServiceImpl implements AuditService {
      * @throws SQLException
      */
     @Override
-    public List<String> getEvents(long playerId) throws SQLException {
+    public List<String> getEvents(long playerId) throws Exception {
         return auditRepository.findAllById(playerId);
     }
 }

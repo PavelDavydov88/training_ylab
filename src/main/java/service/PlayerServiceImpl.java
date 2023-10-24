@@ -1,5 +1,6 @@
 package service;
 
+import aop.annotations.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import model.AccountOperationDTO;
@@ -31,6 +32,7 @@ public class PlayerServiceImpl implements PlayerService {
      * @param token - токен игрока
      * @return значение счета игрока
      */
+
     @Override
     public long getAccount(String token) throws SQLException {
         if (authService.find(token).isEmpty()) {
@@ -57,6 +59,7 @@ public class PlayerServiceImpl implements PlayerService {
      * @throws Exception в случае значение списания больше значения счета,
      *                   или невалидной транзакции
      */
+    @Audit
     @Override
     public long debitAccount(String token, AccountOperationDTO dto) throws Exception {
         if (authService.find(token).isEmpty()) {
@@ -136,17 +139,17 @@ public class PlayerServiceImpl implements PlayerService {
      * @return лист операций игрока
      */
     @Override
-    public List<String> getListOperationAccount(String token) throws SQLException {
-        if (authService.find(token) == null) {
+    public List<String> getListOperationAccount(String token) throws Exception {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return null;
+            throw new Exception("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
         auditService.sendEvent(id, "operation request history of credit/debit operations");
         try {
             return historyCreditDebitRepository.findById(id);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -157,10 +160,10 @@ public class PlayerServiceImpl implements PlayerService {
      * @return лист операций игрока
      */
     @Override
-    public List<String> getListAuditAction(String token) throws SQLException {
-        if (authService.find(token) == null) {
+    public List<String> getListAuditAction(String token) throws Exception {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return null;
+            throw new Exception("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
         return auditService.getEvents(id);

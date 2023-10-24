@@ -1,16 +1,12 @@
 package service;
 
-import model.Player;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import repository.TransactionRepository;
 
 import java.sql.SQLException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.*;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionServiceImplTest {
 

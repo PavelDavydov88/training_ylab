@@ -1,6 +1,6 @@
 package service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import repository.AuditRepository;
 
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ public class AuditServiceImplTest {
     }
 
     @Test
-    public void testThatGetEvents() throws SQLException {
+    public void testThatGetEvents() throws Exception {
         final List<String> dataList = new ArrayList<>();
         dataList.add("event 1");
         dataList.add("event 2");

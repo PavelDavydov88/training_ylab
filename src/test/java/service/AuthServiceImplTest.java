@@ -2,7 +2,7 @@ package service;
 
 import model.Player;
 import model.PlayerDTO;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.OngoingStubbing;
 import repository.AuditRepository;
 import repository.AuthRepository;
@@ -38,7 +38,7 @@ public class AuthServiceImplTest {
         Throwable throwable = catchThrowable(() -> {
             authService.doAuthorization(new PlayerDTO("wrongName", "wrongPassword"));;
         });
-        assertThat(throwable.getMessage()).isEqualTo("java.sql.SQLException: this player doesn't exist");
+        assertThat(throwable.getMessage()).isEqualTo("this player doesn't exist");
     }
 
 }

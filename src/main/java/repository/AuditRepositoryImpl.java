@@ -59,7 +59,7 @@ public class AuditRepositoryImpl implements AuditRepository {
      * @throws SQLException
      */
     @Override
-    public List<String> findAllById(long id) throws SQLException {
+    public List<String> findAllById(long id) throws Exception {
         List<String> listHistory = new ArrayList<>();
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -76,7 +76,7 @@ public class AuditRepositoryImpl implements AuditRepository {
             }
             return listHistory;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new Exception(e.getMessage());
         } finally {
             connection.close();
             preparedStatement.close();

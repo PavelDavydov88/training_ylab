@@ -3,7 +3,7 @@ package service;
 import model.AccountOperationDTO;
 import model.Player;
 import model.PlayerDTO;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import repository.AuditRepository;
 import repository.AuthRepository;
 import repository.HistoryCreditDebitRepository;

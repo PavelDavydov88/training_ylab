@@ -1,28 +1,38 @@
-package in.controller;
+package in.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import config.DBConnectionProvider;
+import jakarta.servlet.ServletRegistration;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Size;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import model.PlayerDTO;
+import model.ResponseDTO;
+import org.hibernate.validator.constraints.NotEmpty;
 import repository.*;
 import service.*;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Set;
 
 import static config.PropertyUtils.getProperty;
 
-
+@Slf4j
 @WebServlet("/registration")
 public class RegistrationServlet extends HttpServlet {
 
@@ -38,6 +48,9 @@ public class RegistrationServlet extends HttpServlet {
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
+
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+
 
     public RegistrationServlet() throws IOException {
     }
@@ -71,18 +84,22 @@ public class RegistrationServlet extends HttpServlet {
         }
     }
 
+
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Validator validator = factory.getValidator();
         PlayerDTO playerDTO = objectMapper.readValue(req.getInputStream(), PlayerDTO.class);
         try {
+            Set<ConstraintViolation<PlayerDTO>> validate = validator.validate(playerDTO);
+            validate.stream().findFirst().ifPresent(e -> {throw new RuntimeException(e.getMessage());});
             playerService.create(playerDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
-            resp.setContentType("text/html");
-            resp.getOutputStream().write("Player created!".getBytes());
+            resp.setContentType("application/json");
+            resp.getOutputStream().write(objectMapper.writeValueAsBytes(new ResponseDTO("Player created!")));
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.setContentType("text/html");
-            resp.getOutputStream().write(e.getMessage().getBytes());
+            resp.setContentType("application/json");
+            resp.getOutputStream().write(objectMapper.writeValueAsBytes(new ResponseDTO(e.getMessage())));
             e.printStackTrace();
         }
     }

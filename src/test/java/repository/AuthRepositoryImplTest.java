@@ -7,10 +7,13 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.junit.jupiter.TestcontainersExtension;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,16 +22,16 @@ import java.sql.Statement;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+@Testcontainers
 public class AuthRepositoryImplTest {
-    @Rule
-    public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
+        @Container
+        public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     AuthRepository authRepository;
     public static final String INSERT_TOKEN = """
             INSERT INTO wallet."auth" ("id" ,"token") VALUES (nextval( 'wallet.sequence_auth'), '1')""";
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
         authRepository = new AuthRepositoryImpl(dbConnectionProvider);

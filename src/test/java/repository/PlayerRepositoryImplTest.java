@@ -9,21 +9,22 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import model.Player;
 import model.PlayerDTO;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Testcontainers
 public class PlayerRepositoryImplTest {
 
-    @Rule
+    @Container
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     PlayerRepository playerRepository;
@@ -31,7 +32,7 @@ public class PlayerRepositoryImplTest {
             INSERT INTO wallet."player" ("id", user_name, password, account)
             VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)""";
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
         playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);

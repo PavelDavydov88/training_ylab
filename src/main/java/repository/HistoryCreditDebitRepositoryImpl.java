@@ -73,7 +73,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
             }
             return listHistory;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e.getMessage());
         } finally {
             connection.close();
             preparedStatement.close();

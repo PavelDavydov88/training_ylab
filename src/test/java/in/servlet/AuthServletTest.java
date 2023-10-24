@@ -1,4 +1,4 @@
-package in.controller;
+package in.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
@@ -7,21 +7,26 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import model.PlayerDTO;
+import model.ResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import service.PlayerService;
+import service.AuthService;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
-public class RegistrationServletTest {
+class AuthServletTest {
     @Mock
-    PlayerService playerService;
+    AuthService authService;
 
     @Mock
     private HttpServletRequest request;
@@ -34,8 +39,10 @@ public class RegistrationServletTest {
     @Mock
     ServletOutputStream outputStream;
 
+    @Mock
+    Optional<String> optional;
     @InjectMocks
-    RegistrationServlet registrationServlet;
+    AuthServlet authServlet;
 
     @SneakyThrows
     @BeforeEach
@@ -49,24 +56,20 @@ public class RegistrationServletTest {
     void thatDonePost() {
         PlayerDTO playerDTO = new PlayerDTO();
         when(objectMapper.readValue(nullable(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
-        registrationServlet.doPost(request, response);
-        verify(playerService).create(playerDTO);
-        verify(outputStream).write("Player created!".getBytes());
+        authServlet.doPost(request, response);
+        verify(authService).doAuthorization(playerDTO);
+        verify(outputStream).write(this.objectMapper.writeValueAsBytes(new ResponseDTO(any(String.class))));
         verify(response).setStatus(HttpServletResponse.SC_CREATED);
-//        ServletInputStream inputStream = mock(ServletInputStream.class);
-//        when(objectMapper.readValue(any(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
-//        registrationServlet.doPost(request, response);
-//        verify(playerService).create(any());
     }
 
     @Test
     void testShouldThrowException() throws IOException, SQLException {
         PlayerDTO playerDTO = new PlayerDTO();
         when(objectMapper.readValue(nullable(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
-        String testMessage = "test message";
-        doThrow(new SQLException(testMessage)).when(playerService).create(playerDTO);
-        registrationServlet.doPost(request, response);
-        verify(outputStream).write(testMessage.getBytes());
+        String testMessage = "this player doesn't exist";
+        doThrow(new SQLException(testMessage)).when(authService).doAuthorization(playerDTO);
+        authServlet.doPost(request, response);
+        verify(outputStream).write(this.objectMapper.writeValueAsBytes(new ResponseDTO(any(String.class))));
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 

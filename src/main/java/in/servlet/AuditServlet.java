@@ -1,4 +1,4 @@
-package in.controller;
+package in.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import config.DBConnectionProvider;
@@ -6,16 +6,18 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.AccountOperationDTO;
+import model.ResponseDTO;
+import model.ResponseListDTO;
 import repository.*;
 import service.*;
 
 import java.io.IOException;
+import java.util.List;
 
 import static config.PropertyUtils.getProperty;
 
-@WebServlet("/player/debit")
-public class PlayerDebitServlet extends HttpServlet {
+@WebServlet("/player/audit")
+public class AuditServlet extends HttpServlet {
 
     DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
     PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
@@ -23,29 +25,28 @@ public class PlayerDebitServlet extends HttpServlet {
     TransactionRepository transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
     HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
-
     AuditService auditService = new AuditServiceImpl(auditRepository);
     AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public PlayerDebitServlet() throws IOException {
+    public AuditServlet() throws IOException {
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");
         try {
-            AccountOperationDTO accountOperationDTO = objectMapper.readValue(req.getInputStream(), AccountOperationDTO.class);
-            Long accountPlayer = playerService.debitAccount(token, accountOperationDTO);
+            List<String> listOperation = playerService.getListAuditAction(token);
             resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("text/html");
-            resp.getOutputStream().write(objectMapper.writeValueAsBytes(accountPlayer));
+            resp.setContentType("application/json");
+            resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(new ResponseListDTO(listOperation)));
+//            resp.getOutputStream().write(objectMapper.writeValueAsBytes(listOperation));
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.setContentType("text/html");
-            resp.getOutputStream().write(e.getMessage().getBytes());
+            resp.setContentType("application/json");
+            resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(new ResponseDTO(e.getMessage())));
             e.printStackTrace();
         }
     }

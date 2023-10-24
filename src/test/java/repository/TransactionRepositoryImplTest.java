@@ -7,10 +7,11 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,9 +20,10 @@ import java.sql.Statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Testcontainers
 public class TransactionRepositoryImplTest {
 
-    @Rule
+    @Container
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     TransactionRepository transactionRepository;
@@ -29,7 +31,7 @@ public class TransactionRepositoryImplTest {
             INSERT INTO wallet."transaction" ("id" , "id_player","transaction")
             VALUES (nextval( 'wallet.sequence_transaction'), 10,'1')""";
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(
                 postgresContainer.getJdbcUrl(),

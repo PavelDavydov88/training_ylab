@@ -1,4 +1,4 @@
-package in.controller;
+package in.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import config.DBConnectionProvider;
@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.PlayerDTO;
+import model.ResponseDTO;
 import repository.*;
 import service.AuthService;
 import service.AuthServiceImpl;
@@ -35,12 +36,12 @@ public class AuthServlet extends HttpServlet {
         try {
             Optional<String> token = authService.doAuthorization(playerDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
-            resp.setContentType("text/html");
-            resp.getOutputStream().write(token.get().getBytes());
+            resp.setContentType("application/json");
+            resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(new ResponseDTO(token.orElse("default token"))));
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.setContentType("text/html");
-            resp.getOutputStream().write(e.getMessage().getBytes());
+            resp.setContentType("application/json");
+            resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(new ResponseDTO(e.getMessage())));
             e.printStackTrace();
         }
     }
