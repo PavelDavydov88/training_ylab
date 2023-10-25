@@ -5,8 +5,8 @@ import repository.TransactionRepository;
 
 import java.sql.SQLException;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionServiceImplTest {
 
@@ -24,7 +24,7 @@ public class TransactionServiceImplTest {
     @Test
     public void testThatTransactionExist() throws SQLException {
         when(transactionRepository.find(anyLong())).thenReturn(1L);
-        assertThat(transactionService.checkExist(1L)).isTrue();
+        assertTrue(transactionService.checkExist(1L));
 
     }
 }

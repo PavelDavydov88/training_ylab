@@ -9,11 +9,9 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.junit.jupiter.TestcontainersExtension;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,11 +19,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @Testcontainers
 public class AuthRepositoryImplTest {
-        @Container
-        public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
+    @Container
+    public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     AuthRepository authRepository;
     public static final String INSERT_TOKEN = """
@@ -54,19 +54,19 @@ public class AuthRepositoryImplTest {
     public void thatSaveToken() throws SQLException {
         authRepository.save("2");
         Optional<String> token = authRepository.find("2");
-        assertThat(token.get()).isEqualTo("2");
+        assertEquals("2", token.get());
     }
 
     @Test
     public void thatFindByToken() throws SQLException {
         Optional<String> token = authRepository.find("1");
-        assertThat(token.get()).isEqualTo("1");
+        assertEquals("1", token.get());
     }
 
     @Test
     public void thatDeleteToken() throws SQLException {
         authRepository.delete("1");
         Optional<String> token = authRepository.find("1");
-        assertThat(token).isEmpty();
+        assertTrue(token.isEmpty());
     }
 }

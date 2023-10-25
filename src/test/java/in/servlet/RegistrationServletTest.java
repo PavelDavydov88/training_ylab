@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 
 public class RegistrationServletTest {
     @Mock
-    PlayerService playerService;
+    private PlayerService playerService;
 
     @Mock
     private HttpServletRequest request;
@@ -33,10 +33,14 @@ public class RegistrationServletTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    ServletOutputStream outputStream;
+    private ServletOutputStream outputStream;
+
+    //    @Mock
+//    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+//    Validator validator = factory.getValidator();
 
     @InjectMocks
-    RegistrationServlet registrationServlet;
+    private RegistrationServlet registrationServlet;
 
     @SneakyThrows
     @BeforeEach
@@ -48,7 +52,7 @@ public class RegistrationServletTest {
     @SneakyThrows
     @Test
     void thatDonePost() {
-        PlayerDTO playerDTO = new PlayerDTO();
+        PlayerDTO playerDTO = new PlayerDTO("test", "test");
         when(objectMapper.readValue(nullable(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
         registrationServlet.doPost(request, response);
         verify(playerService).create(playerDTO);
@@ -58,14 +62,12 @@ public class RegistrationServletTest {
 
     @Test
     void testShouldThrowException() throws IOException, SQLException {
-        PlayerDTO playerDTO = new PlayerDTO();
+        PlayerDTO playerDTO = new PlayerDTO("test", "test");
         when(objectMapper.readValue(nullable(ServletInputStream.class), eq(PlayerDTO.class))).thenReturn(playerDTO);
         String testMessage = "test message";
         doThrow(new SQLException(testMessage)).when(playerService).create(playerDTO);
         registrationServlet.doPost(request, response);
-//        write(this.objectMapper.writeValueAsBytes(new ResponseDTO(e.getMessage())));
         verify(outputStream).write(this.objectMapper.writeValueAsBytes(new ResponseDTO(anyString())));
-//        verify(outputStream).write(testMessage.getBytes());
         verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 

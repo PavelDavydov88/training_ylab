@@ -1,6 +1,6 @@
 package config;
 
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,9 +8,7 @@ import java.sql.DriverManager;
 /**
  * класс который предоставляет connection
  */
-//@Data
 @RequiredArgsConstructor
-//@NoArgsConstructor
 public class DBConnectionProvider {
 
     private  final String url ;

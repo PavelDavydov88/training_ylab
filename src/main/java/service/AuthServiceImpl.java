@@ -1,14 +1,13 @@
 package service;
 
+import aop.annotations.Audit;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import liquibase.sql.Sql;
 import lombok.RequiredArgsConstructor;
 import model.Player;
 import model.PlayerDTO;
-import repository.AuditRepository;
 import repository.AuthRepository;
 import repository.PlayerRepository;
 
@@ -27,13 +26,14 @@ public class AuthServiceImpl implements AuthService {
 
     private final PlayerRepository playerRepository;
     private final AuthRepository authRepository;
-    private final AuditRepository auditRepository;
+//    private final AuditRepository auditRepository;
 
     /**
      * метод авторизации игрока
      *
      * @param dto@return токен
      */
+    @Audit(success = "authorization completed successful")
     @Override
     public Optional<String> doAuthorization(PlayerDTO dto) throws SQLException {
 
@@ -44,14 +44,10 @@ public class AuthServiceImpl implements AuthService {
             throw new SQLException(e.getMessage());
         }
 
-//        if (player == null) {
-//            return new SQLException ("this player doesn't exist");
-//        } else {
-            String token = createJWT(String.valueOf(player.getId()), "test", player.toString(), System.currentTimeMillis());
-            authRepository.save(token);
-            auditRepository.save(player.getId(), "authorization completed successful");
-            return Optional.of(token);
-//        }
+        String token = createJWT(String.valueOf(player.getId()), "test", player.toString(), System.currentTimeMillis());
+        authRepository.save(token);
+//        auditRepository.save(player.getId(), "authorization completed successful");
+        return Optional.of(token);
     }
 
     /**
@@ -59,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
      *
      * @param token токен игрока
      */
+    @Audit(success = "exit of authorization player done")
     @Override
     public void exitAuthorization(String token) throws SQLException {
         int idPlayer = Integer.parseInt(decodeJWT(token).getId());
@@ -68,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        auditRepository.save(player.getId(), "exit of authorization player done");
+//        auditRepository.save(player.getId(), "exit of authorization player done");
         authRepository.delete(token);
     }
 

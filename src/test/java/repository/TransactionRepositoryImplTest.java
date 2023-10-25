@@ -18,7 +18,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Testcontainers
 public class TransactionRepositoryImplTest {
@@ -64,18 +65,18 @@ public class TransactionRepositoryImplTest {
     public void testThatSaveTransaction() throws SQLException {
         transactionRepository.save(1l, 2L);
         Long transaction = transactionRepository.find(2L);
-        assertThat(transaction).isEqualTo(2L);
+        assertEquals(2L, transaction);
     }
 
     @Test
     public void thatFindByNameTransaction() throws SQLException {
         Long transaction = transactionRepository.find(1L);
-        assertThat(transaction).isEqualTo(1L);
+        assertEquals(1L, transaction);
     }
 
     @Test
     public void thatFindByNameTransactionReturnNull() throws SQLException {
         Long transaction = transactionRepository.find(0L);
-        assertThat(transaction).isNull();
+        assertNull(transaction);
     }
 }

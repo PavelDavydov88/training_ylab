@@ -22,7 +22,6 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 
 class AuthServletTest {
     @Mock

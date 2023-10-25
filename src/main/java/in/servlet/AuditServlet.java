@@ -26,7 +26,7 @@ public class AuditServlet extends HttpServlet {
     HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
     AuditService auditService = new AuditServiceImpl(auditRepository);
-    AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
+    AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -38,11 +38,13 @@ public class AuditServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");
         try {
+            if (token == null) {
+                throw new RuntimeException("token is null");
+            }
             List<String> listOperation = playerService.getListAuditAction(token);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
             resp.getOutputStream().write(this.objectMapper.writeValueAsBytes(new ResponseListDTO(listOperation)));
-//            resp.getOutputStream().write(objectMapper.writeValueAsBytes(listOperation));
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             resp.setContentType("application/json");

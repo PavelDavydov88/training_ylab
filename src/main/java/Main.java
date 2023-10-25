@@ -1,23 +1,28 @@
-//import config.DBConnectionProvider;
-//import liquibase.Liquibase;
-//import liquibase.database.Database;
-//import liquibase.database.DatabaseFactory;
-//import liquibase.database.jvm.JdbcConnection;
-//import liquibase.resource.ClassLoaderResourceAccessor;
-//import model.PlayerDTO;
-//import repository.*;
-//import service.*;
-//
-//import java.io.IOException;
-//import java.sql.Connection;
-//import java.sql.SQLException;
-//import java.sql.Statement;
-//import java.util.Scanner;
-//
-//import static config.PropertyUtils.getProperty;
-//
-//public class Main {
-//    public static void main(String[] args) throws SQLException, IOException {
+import config.DBConnectionProvider;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
+import model.PlayerDTO;
+import org.slf4j.impl.SimpleLoggerFactory;
+import repository.*;
+import service.*;
+import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+import static config.PropertyUtils.getProperty;
+
+//@Slf4j
+public class Main {
+    public static void main(String[] args) throws SQLException, IOException {
+        System.out.println("from sout");
+        SimpleLoggerFactory simpleLoggerFactory = new SimpleLoggerFactory();
+//        simpleLoggerFactory..getLogger("from slf4j");
 //        Connection connection = null;
 //        Database database = null;
 //        Statement statement = null;
@@ -46,7 +51,7 @@
 //        AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
 //
 //        AuditService auditService = new AuditServiceImpl(auditRepository);
-//        AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
+//        AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
 //        TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
 //        PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
 //
@@ -141,5 +146,5 @@
 //        System.out.println("8: exit of authorization");
 //        System.out.println("0: exit of program");
 //        System.out.print("Enter your selection : ");
-//    }
-//}
+    }
+}

@@ -25,7 +25,7 @@ public class PlayerAccountServlet extends HttpServlet {
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
 
     AuditService auditService = new AuditServiceImpl(auditRepository);
-    AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
+    AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -37,6 +37,9 @@ public class PlayerAccountServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");
         try {
+            if (token == null) {
+                throw new RuntimeException("token is null");
+            }
             Long accountPlayer = playerService.getAccount(token);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");

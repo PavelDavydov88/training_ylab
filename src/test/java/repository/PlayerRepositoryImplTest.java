@@ -19,7 +19,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import static org.assertj.core.api.Assertions.assertThat;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
 public class PlayerRepositoryImplTest {
@@ -56,14 +57,14 @@ public class PlayerRepositoryImplTest {
         Player getDefaultPlayer = getDefaultPlayer();
         playerRepository.save(getDefaultPlayer);
         Player player = playerRepository.findByNamePassword(getDefaultPlayerDto());
-        assertThat(player.getId()).isEqualTo(11);
-        assertThat(player.getName()).isEqualTo("Ivan");
+        assertEquals(11, player.getId());
+        assertEquals("Ivan", player.getName());
     }
 
     @Test
     public void thatFindById() throws SQLException {
         Player player = playerRepository.findById(10);
-        assertThat(player.getName()).isEqualTo("Pavel");
+        assertEquals("Pavel", player.getName());
     }
 
     private Player getDefaultPlayer() {

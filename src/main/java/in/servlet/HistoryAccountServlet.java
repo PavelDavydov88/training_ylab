@@ -11,7 +11,6 @@ import model.ResponseListDTO;
 import repository.*;
 import service.*;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class HistoryAccountServlet extends HttpServlet {
     HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
     AuditService auditService = new AuditServiceImpl(auditRepository);
-    AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
+    AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -39,6 +38,9 @@ public class HistoryAccountServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");
         try {
+            if (token == null) {
+                throw new RuntimeException("token is null");
+            }
             List<String> listOperation = playerService.getListOperationAccount(token);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");

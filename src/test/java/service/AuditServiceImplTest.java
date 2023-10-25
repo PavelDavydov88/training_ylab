@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class AuditServiceImplTest {
@@ -29,6 +29,6 @@ public class AuditServiceImplTest {
         dataList.add("event 2");
         when(auditRepository.findAllById(1)).thenReturn(dataList);
         List<String> listEvent = auditService.getEvents(1);
-        assertThat(listEvent.size()).isEqualTo(2);
+        assertEquals(2, listEvent.size());
     }
 }

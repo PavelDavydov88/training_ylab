@@ -25,10 +25,11 @@ public class PlayerCreditServlet extends HttpServlet {
     HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
     AuditService auditService = new AuditServiceImpl(auditRepository);
-    AuthService authService = new AuthServiceImpl(playerRepository, authRepository, auditRepository);
+    AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
+//    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 
     public PlayerCreditServlet() throws IOException {
     }
@@ -36,8 +37,14 @@ public class PlayerCreditServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");
+//        Validator validator = factory.getValidator();
         try {
+            if (token == null) {
+                throw new RuntimeException("token is null");
+            }
             AccountOperationDTO accountOperationDTO = objectMapper.readValue(req.getInputStream(), AccountOperationDTO.class);
+//            Set<ConstraintViolation<AccountOperationDTO>> validate = validator.validate(accountOperationDTO);
+//            validate.stream().findFirst().ifPresent(e -> {throw new RuntimeException(e.getMessage());});
             Long accountPlayer = playerService.creditAccount(token, accountOperationDTO);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
