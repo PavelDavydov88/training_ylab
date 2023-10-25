@@ -15,6 +15,9 @@ import java.io.IOException;
 
 import static config.PropertyUtils.getProperty;
 
+/**
+ * Сервлет для выполнения кредита игрока
+ */
 @WebServlet("/player/credit")
 public class PlayerCreditServlet extends HttpServlet {
 
@@ -29,22 +32,25 @@ public class PlayerCreditServlet extends HttpServlet {
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
     PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
     ObjectMapper objectMapper = new ObjectMapper();
-//    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 
     public PlayerCreditServlet() throws IOException {
     }
 
+    /**
+     * Метод для выполнения кредита игрока
+     *
+     * @param req  входные данные запроса
+     * @param resp JSON ответ на запрос
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");
-//        Validator validator = factory.getValidator();
         try {
             if (token == null) {
                 throw new RuntimeException("token is null");
             }
             AccountOperationDTO accountOperationDTO = objectMapper.readValue(req.getInputStream(), AccountOperationDTO.class);
-//            Set<ConstraintViolation<AccountOperationDTO>> validate = validator.validate(accountOperationDTO);
-//            validate.stream().findFirst().ifPresent(e -> {throw new RuntimeException(e.getMessage());});
             Long accountPlayer = playerService.creditAccount(token, accountOperationDTO);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");

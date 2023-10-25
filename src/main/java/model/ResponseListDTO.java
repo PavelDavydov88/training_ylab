@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Клас DTO для ответа request JSON(String : List<String>)
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

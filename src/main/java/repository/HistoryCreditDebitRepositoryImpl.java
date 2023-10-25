@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * класс для хранения истории дебит/кредит
+ * Класс для хранения истории дебит/кредит
  */
 @RequiredArgsConstructor
 public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
@@ -23,7 +23,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
             select * from wallet."history-credit-debit" where "id_player" = ?""";
 
     /**
-     * метод сохраняет историю дебит/кредит игрока
+     * Метод сохраняет историю дебит/кредит игрока
      *
      * @param idPlayer    ID игрока
      * @param historyText история дебит/кредит игрока

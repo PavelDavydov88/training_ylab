@@ -19,39 +19,37 @@ import java.util.Date;
 import java.util.Optional;
 
 /**
- * класс предоставляет сервис по авторизации и завершения работы игрока
+ * Класс предоставляет сервис по авторизации и завершения работы игрока
  */
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final PlayerRepository playerRepository;
     private final AuthRepository authRepository;
-//    private final AuditRepository auditRepository;
 
     /**
-     * метод авторизации игрока
+     * Метод авторизации игрока
      *
-     * @param dto@return токен
+     * @param dto DTO игрока
+     * @return возращает токен опционально
+     * @throws SQLException
      */
     @Audit(success = "authorization completed successful")
     @Override
     public Optional<String> doAuthorization(PlayerDTO dto) throws SQLException {
-
         Player player = null;
         try {
             player = playerRepository.findByNamePassword(dto);
         } catch (SQLException e) {
             throw new SQLException(e.getMessage());
         }
-
         String token = createJWT(String.valueOf(player.getId()), "test", player.toString(), System.currentTimeMillis());
         authRepository.save(token);
-//        auditRepository.save(player.getId(), "authorization completed successful");
         return Optional.of(token);
     }
 
     /**
-     * метод по удалению токена из репозитория
+     * Метод для удаления токена из репозитория
      *
      * @param token токен игрока
      */
@@ -59,18 +57,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void exitAuthorization(String token) throws SQLException {
         int idPlayer = Integer.parseInt(decodeJWT(token).getId());
-        Player player = null;
         try {
-            player = playerRepository.findById(idPlayer);
+            playerRepository.findById(idPlayer);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-//        auditRepository.save(player.getId(), "exit of authorization player done");
         authRepository.delete(token);
     }
 
     /**
-     * метод генерации токена
+     * Метод генерации токена
      *
      * @param id        id токена
      * @param issuer    эмитент токена
@@ -99,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * метод декодинга токена
+     * Метод декодинга токена
      *
      * @param jwt токен
      * @return расшифрованный токен

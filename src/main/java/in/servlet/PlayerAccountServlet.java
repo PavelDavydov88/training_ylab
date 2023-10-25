@@ -14,6 +14,9 @@ import java.io.IOException;
 
 import static config.PropertyUtils.getProperty;
 
+/**
+ * Сервлет для получения счета игрока
+ */
 @WebServlet("/player/account")
 public class PlayerAccountServlet extends HttpServlet {
 
@@ -33,6 +36,13 @@ public class PlayerAccountServlet extends HttpServlet {
     public PlayerAccountServlet() throws IOException {
     }
 
+    /**
+     * Метод для получения счета игрока
+     *
+     * @param req  входные данные запроса
+     * @param resp JSON ответ на запрос
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");

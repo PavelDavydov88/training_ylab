@@ -5,13 +5,13 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * класс предоставляет properties
+ * Класс предоставляет properties
  */
 public class PropertyUtils {
     private static final Properties PROPERTY = new Properties();
 
     /**
-     * метод предоставляет property из configFile
+     * Метод предоставляет property из configFile
      *
      * @param keyProperty ключ property
      * @return значение property

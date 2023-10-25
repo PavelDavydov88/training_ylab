@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * класс для хранения audit
+ * Класс для хранения audit
  */
 @RequiredArgsConstructor
 public class AuditRepositoryImpl implements AuditRepository {
@@ -26,10 +26,10 @@ public class AuditRepositoryImpl implements AuditRepository {
             select * from wallet."audit" where "id_player" = ?""";
 
     /**
-     * метод сохраняет действия игрока
+     * Метод сохраняет действия игрока
      *
      * @param idPlayer    ID игрока
-     * @param historyText действия игрока
+     * @param historyText действие игрока
      * @throws SQLException
      */
     @Override

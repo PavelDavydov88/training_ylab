@@ -5,6 +5,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+/**
+ * Аспект для логирования всех Методов
+ */
 @Aspect
 @Slf4j
 public class LoggableAspect {

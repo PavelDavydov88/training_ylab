@@ -6,13 +6,16 @@ import repository.AuditRepository;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Класс предоставляет сервис аудита игрока
+ */
 @RequiredArgsConstructor
 public class AuditServiceImpl implements AuditService {
 
     private final AuditRepository auditRepository;
 
     /**
-     * метод записывает события в репозиторий
+     * Метод отправляет события для записи в репозиторий
      *
      * @param playerId     ID игрока
      * @param auditMessage текст события
@@ -24,7 +27,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     /**
-     * Метод возвращает список событий игрока
+     * Метод возвращает список событий игрока из репозитория
      *
      * @param playerId ID игрока
      * @return коллекция событий

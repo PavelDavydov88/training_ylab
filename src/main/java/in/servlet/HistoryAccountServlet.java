@@ -16,6 +16,9 @@ import java.util.List;
 
 import static config.PropertyUtils.getProperty;
 
+/**
+ * Сервлет для получения истории операций по счету игрока
+ */
 @WebServlet("/player/history")
 public class HistoryAccountServlet extends HttpServlet {
 
@@ -34,6 +37,13 @@ public class HistoryAccountServlet extends HttpServlet {
     public HistoryAccountServlet() throws IOException {
     }
 
+    /**
+     * Метод для получения истории операция по счету
+     *
+     * @param req  входные данные запроса
+     * @param resp JSON ответ на запрос
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");

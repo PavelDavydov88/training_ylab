@@ -6,17 +6,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 /**
- * класс который предоставляет connection
+ * Класс который предоставляет connection
  */
 @RequiredArgsConstructor
 public class DBConnectionProvider {
 
-    private  final String url ;
-    private final String username ;
-    private final String password ;
+    private final String url;
+    private final String username;
+    private final String password;
 
     /**
-     * метод создает connection
+     * Метод создает connection
      *
      * @return connection
      */
@@ -33,8 +33,8 @@ public class DBConnectionProvider {
         }
     }
 
-    protected boolean canEqual(final Object other) {
-        return other instanceof DBConnectionProvider;
-    }
+//    protected boolean canEqual(final Object other) {
+//        return other instanceof DBConnectionProvider;
+//    }
 
 }

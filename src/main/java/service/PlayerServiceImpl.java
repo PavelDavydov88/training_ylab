@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * класс предоставляет сервис по работе с данными игрока
+ * Класс предоставляет сервис по работе с данными игрока
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -46,16 +46,15 @@ public class PlayerServiceImpl implements PlayerService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-//        auditService.sendEvent(player.getId(), "getting account");
         return player.getAccount();
     }
 
     /**
-     * метод для выполнения операции debit
+     * Метод для выполнения операции debit
      *
      * @param token токен игрока
-     * @param dto
-     * @return возращает счета игрока
+     * @param dto   DTO операции игрока
+     * @return возращает счет игрока
      * @throws Exception в случае значение списания больше значения счета,
      *                   или невалидной транзакции
      */
@@ -71,27 +70,24 @@ public class PlayerServiceImpl implements PlayerService {
 
         if (transactionService.checkExist(dto.getTransaction())) {
             String auditMessage = "debit operation have not been done, this transaction is exist";
-//            auditService.sendEvent(player.getId(), "debit operation have not been done, this transaction is exist");
             throw new Exception(dto.getTransaction() + auditMessage);
         }
         transactionService.save(id, dto.getTransaction());
         if (player.getAccount() < dto.getValueOperation()) {
             String auditMessage = "debit operation have not been done, the player doesn't have enough money";
-//            auditService.sendEvent(player.getId(), "debit operation have not been done, the player doesn't have enough money");
             throw new Exception(auditMessage);
         }
         player.setAccount(player.getAccount() - dto.getValueOperation());
         historyCreditDebitRepository.save(player.getId(), "debit account - " + dto.getValueOperation());
-//        auditService.sendEvent(player.getId(), "debit operation completed");
         player = playerRepository.update(player);
         return player.getAccount();
     }
 
     /**
-     * метод для выполнения операции credit
+     * Метод для выполнения операции credit
      *
      * @param token токен игрока
-     * @param dto
+     * @param dto   DTO операции игрока
      * @return возращает счета игрока
      * @throws Exception в случае невалидной транзакции
      */
@@ -107,13 +103,11 @@ public class PlayerServiceImpl implements PlayerService {
         Player player = playerRepository.findById(id);
         if (transactionService.checkExist(dto.getTransaction())) {
             String auditMessage = "debit operation have not been done, this transaction is exist";
-//            auditService.sendEvent(player.getId(), "debit operation have not been done, this transaction is exist");
             throw new Exception(dto.getTransaction() + auditMessage);
         }
         transactionService.save(id, dto.getTransaction());
         player.setAccount(player.getAccount() + dto.getValueOperation());
         historyCreditDebitRepository.save(player.getId(), "credit account + " + dto.getValueOperation());
-//        auditService.sendEvent(player.getId(), "credit operation completed");
         player = playerRepository.update(player);
         return player.getAccount();
     }
@@ -121,7 +115,7 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод создания игрока
      *
-     * @param dto данные для создания игрока (name, password)
+     * @param dto DTO данные для создания игрока (name, password)
      * @throws SQLException
      */
 
@@ -131,7 +125,7 @@ public class PlayerServiceImpl implements PlayerService {
         try {
             Player playerInput = PlayerMapper.INSTANCE.toModel(dto);
             playerRepository.save(playerInput);
-            Player player = playerRepository.findByNamePassword(dto);
+//            Player player = playerRepository.findByNamePassword(dto);
 //            auditService.sendEvent(player.getId(), "registration completed successful");
         } catch (SQLException e) {
             throw new SQLException(e);
@@ -139,7 +133,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     /**
-     * метод для получения истории пополнения/снятия средств игроком
+     * Метод для получения истории пополнения/снятия средств игроком
      *
      * @param token токен игрока
      * @return лист операций игрока
@@ -152,7 +146,6 @@ public class PlayerServiceImpl implements PlayerService {
             throw new Exception("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
-//        auditService.sendEvent(id, "operation request history of credit/debit operations");
         try {
             return historyCreditDebitRepository.findById(id);
         } catch (SQLException e) {
@@ -161,7 +154,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     /**
-     * метод для получения аудита действий игрока
+     * Метод для получения аудита действий игрока
      *
      * @param token токен игрока
      * @return лист операций игрока

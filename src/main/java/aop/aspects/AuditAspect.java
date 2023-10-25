@@ -16,6 +16,9 @@ import java.io.IOException;
 
 import static config.PropertyUtils.getProperty;
 
+/**
+ * Аспект для аудита
+ */
 @Aspect
 public class AuditAspect {
     private final DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));

@@ -16,6 +16,9 @@ import java.util.List;
 
 import static config.PropertyUtils.getProperty;
 
+/**
+ * Класс сервлета для получения аудита игрока
+ */
 @WebServlet("/player/audit")
 public class AuditServlet extends HttpServlet {
 
@@ -34,6 +37,13 @@ public class AuditServlet extends HttpServlet {
     public AuditServlet() throws IOException {
     }
 
+    /**
+     * Метод для предоствления аудита игрока
+     *
+     * @param req  входные данные запроса
+     * @param resp JSON ответ на запрос
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String token = req.getHeader("token");

@@ -6,7 +6,7 @@ import repository.TransactionRepository;
 import java.sql.SQLException;
 
 /**
- * класс предоставляет сервис по работе с транзакциями
+ * Класс предоставляет сервис по работе с транзакциями
  */
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -14,7 +14,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     /**
-     * метод для сохранения транзакции в репозитории
+     * Метод для сохранения транзакции в репозитории
      *
      * @param idPlayer    ID игрока
      * @param transaction номер транзакции
@@ -28,10 +28,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * метод рповерки существоания номера транзакции
+     * Метод проверки существоания номера транзакции
      *
-     * @param transaction номера транзакции
-     * @return true если номера транзакции существует, false если нет
+     * @param transaction номер транзакции
+     * @return true если номер транзакции существует, false если нет
      */
     @Override
     public boolean checkExist(Long transaction) throws SQLException {

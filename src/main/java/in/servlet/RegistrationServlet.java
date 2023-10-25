@@ -25,6 +25,9 @@ import java.sql.Statement;
 
 import static config.PropertyUtils.getProperty;
 
+/**
+ * Сервлет для регистрации игрока
+ */
 @Slf4j
 @WebServlet("/registration")
 public class RegistrationServlet extends HttpServlet {
@@ -35,7 +38,6 @@ public class RegistrationServlet extends HttpServlet {
     TransactionRepository transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
     HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
-
     AuditService auditService = new AuditServiceImpl(auditRepository);
     AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
     TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
@@ -45,6 +47,10 @@ public class RegistrationServlet extends HttpServlet {
     public RegistrationServlet() throws IOException {
     }
 
+    /**
+     * Метод инициализации сервлета и инициализации  Liquibase
+     *
+     */
     @SneakyThrows
     @Override
     public void init() {
@@ -74,7 +80,13 @@ public class RegistrationServlet extends HttpServlet {
         }
     }
 
-
+    /**
+     * Метод для выполнения регистрации игрока
+     *
+     * @param req
+     * @param resp
+     * @throws IOException
+     */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PlayerDTO playerDTO = objectMapper.readValue(req.getInputStream(), PlayerDTO.class);

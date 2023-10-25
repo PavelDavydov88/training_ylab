@@ -17,6 +17,9 @@ import java.util.Optional;
 
 import static config.PropertyUtils.getProperty;
 
+/**
+ * Сервлет для авторизации
+ */
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
@@ -26,18 +29,21 @@ public class AuthServlet extends HttpServlet {
     AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
     AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
     ObjectMapper objectMapper = new ObjectMapper();
-//    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 
     public AuthServlet() throws IOException {
     }
 
+    /**
+     * Метод для получения token после авторизации
+     *
+     * @param req  входные данные запроса
+     * @param resp JSON token
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PlayerDTO playerDTO = objectMapper.readValue(req.getInputStream(), PlayerDTO.class);
-//        Validator validator = factory.getValidator();
         try {
-//            Set<ConstraintViolation<PlayerDTO>> validate = validator.validate(playerDTO);
-//            validate.stream().findFirst().ifPresent(e -> {throw new RuntimeException(e.getMessage());});
             Optional<String> token = authService.doAuthorization(playerDTO);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setContentType("application/json");

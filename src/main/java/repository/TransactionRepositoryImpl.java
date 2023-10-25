@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * класс для хранения транзакций
+ * Класс для хранения транзакций
  */
 @RequiredArgsConstructor
 public class TransactionRepositoryImpl implements TransactionRepository {
@@ -22,7 +22,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             select * from wallet."transaction" where "transaction" = ?""";
 
     /**
-     * метод сохраняет транзакцию
+     * Метод сохраняет транзакцию
      *
      * @param idPlayer    ID игрока
      * @param transaction транзакция
@@ -47,7 +47,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     /**
-     * метод поиска транзакции
+     * Метод поиска транзакции
      *
      * @param transaction транзакция
      * @return транзакцию. Если не существует, возращает null
