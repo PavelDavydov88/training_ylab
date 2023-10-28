@@ -7,7 +7,6 @@ import model.AccountOperationDTO;
 import model.Player;
 import model.PlayerDTO;
 import model.mapper.PlayerMapper;
-import repository.HistoryCreditDebitRepository;
 import repository.PlayerRepository;
 
 import java.sql.SQLException;
@@ -23,8 +22,7 @@ public class PlayerServiceImpl implements PlayerService {
     private final PlayerRepository playerRepository;
     private final TransactionService transactionService;
     private final AuthService authService;
-    private final HistoryCreditDebitRepository historyCreditDebitRepository;
-    private final AuditService auditService;
+    private final HistoryCreditDebitService historyCreditDebitService;
 
     /**
      * Метод возвращает значение счета игрока
@@ -78,7 +76,7 @@ public class PlayerServiceImpl implements PlayerService {
             throw new Exception(auditMessage);
         }
         player.setAccount(player.getAccount() - dto.getValueOperation());
-        historyCreditDebitRepository.save(player.getId(), "debit account - " + dto.getValueOperation());
+        historyCreditDebitService.sendHistory(player.getId(), "debit account - " + dto.getValueOperation());
         player = playerRepository.update(player);
         return player.getAccount();
     }
@@ -107,7 +105,7 @@ public class PlayerServiceImpl implements PlayerService {
         }
         transactionService.save(id, dto.getTransaction());
         player.setAccount(player.getAccount() + dto.getValueOperation());
-        historyCreditDebitRepository.save(player.getId(), "credit account + " + dto.getValueOperation());
+        historyCreditDebitService.sendHistory(player.getId(), "credit account + " + dto.getValueOperation());
         player = playerRepository.update(player);
         return player.getAccount();
     }
@@ -125,47 +123,9 @@ public class PlayerServiceImpl implements PlayerService {
         try {
             Player playerInput = PlayerMapper.INSTANCE.toModel(dto);
             playerRepository.save(playerInput);
-//            Player player = playerRepository.findByNamePassword(dto);
-//            auditService.sendEvent(player.getId(), "registration completed successful");
         } catch (SQLException e) {
             throw new SQLException(e);
         }
     }
 
-    /**
-     * Метод для получения истории пополнения/снятия средств игроком
-     *
-     * @param token токен игрока
-     * @return лист операций игрока
-     */
-    @Audit(success = "operation request history of credit/debit operations")
-    @Override
-    public List<String> getListOperationAccount(String token) throws Exception {
-        if (authService.find(token).isEmpty()) {
-            log.info("invalid token");
-            throw new Exception("invalid token");
-        }
-        int id = Integer.parseInt(authService.decodeJWT(token).getId());
-        try {
-            return historyCreditDebitRepository.findById(id);
-        } catch (SQLException e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
-    /**
-     * Метод для получения аудита действий игрока
-     *
-     * @param token токен игрока
-     * @return лист операций игрока
-     */
-    @Override
-    public List<String> getListAuditAction(String token) throws Exception {
-        if (authService.find(token).isEmpty()) {
-            log.info("invalid token");
-            throw new Exception("invalid token");
-        }
-        int id = Integer.parseInt(authService.decodeJWT(token).getId());
-        return auditService.getEvents(id);
-    }
 }

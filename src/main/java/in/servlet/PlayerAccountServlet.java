@@ -20,18 +20,16 @@ import static config.PropertyUtils.getProperty;
 @WebServlet("/player/account")
 public class PlayerAccountServlet extends HttpServlet {
 
-    DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
-    PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
-    AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
-    TransactionRepository transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
-    HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
-    AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
-
-    AuditService auditService = new AuditServiceImpl(auditRepository);
-    AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
-    TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
-    PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
-    ObjectMapper objectMapper = new ObjectMapper();
+    private DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
+    private PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
+    private AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
+    private TransactionRepository transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
+    private HistoryCreditDebitRepository historyCreditDebitRepository = new HistoryCreditDebitRepositoryImpl(dbConnectionProvider);
+    private AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
+    private HistoryCreditDebitService historyCreditDebitService = new HistoryCreditDebitServiceImpl(authService, historyCreditDebitRepository);
+    private TransactionService transactionService = new TransactionServiceImpl(transactionRepository);
+    private PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitService);
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public PlayerAccountServlet() throws IOException {
     }

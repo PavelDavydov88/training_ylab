@@ -21,16 +21,14 @@ import static org.mockito.Mockito.*;
 public class PlayerServiceImplTest {
     private final PlayerRepository playerRepository = mock(PlayerRepository.class);
     private final AuthRepository authRepository = mock(AuthRepository.class);
-    private final HistoryCreditDebitRepository historyCreditDebitRepository = mock(HistoryCreditDebitRepository.class);
-    private final AuditService auditService = mock(AuditService.class);
     private final TransactionService transactionService = mock(TransactionService.class);
-
+    private final HistoryCreditDebitService historyCreditDebitService = mock(HistoryCreditDebitService.class);
     private final AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
-    private final PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitRepository, auditService);
+    private final PlayerService playerService = new PlayerServiceImpl(playerRepository, transactionService, authService, historyCreditDebitService);
 
     @SneakyThrows
     @Test
-    public void testThatDoneCreate()  {
+    public void testThatDoneCreate() {
         when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         playerService.create(new PlayerDTO("Pavel", "password"));
         verify(playerRepository).save(any(Player.class));
@@ -38,7 +36,7 @@ public class PlayerServiceImplTest {
 
     @SneakyThrows
     @Test
-    public void testThatGetAccount()  {
+    public void testThatGetAccount() {
         when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
         when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());

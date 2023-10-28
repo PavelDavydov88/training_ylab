@@ -35,10 +35,6 @@ public class RegistrationServletTest {
     @Mock
     private ServletOutputStream outputStream;
 
-    //    @Mock
-//    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//    Validator validator = factory.getValidator();
-
     @InjectMocks
     private RegistrationServlet registrationServlet;
 

@@ -1,6 +1,7 @@
 package service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import repository.AuditRepository;
 
 import java.sql.SQLException;
@@ -10,9 +11,11 @@ import java.util.List;
  * Класс предоставляет сервис аудита игрока
  */
 @RequiredArgsConstructor
+@Slf4j
 public class AuditServiceImpl implements AuditService {
 
     private final AuditRepository auditRepository;
+    private final AuthService authService;
 
     /**
      * Метод отправляет события для записи в репозиторий
@@ -27,14 +30,18 @@ public class AuditServiceImpl implements AuditService {
     }
 
     /**
-     * Метод возвращает список событий игрока из репозитория
+     * Метод для получения аудита действий игрока
      *
-     * @param playerId ID игрока
-     * @return коллекция событий
-     * @throws SQLException
+     * @param token токен игрока
+     * @return лист операций игрока
      */
     @Override
-    public List<String> getEvents(long playerId) throws Exception {
-        return auditRepository.findAllById(playerId);
+    public List<String> getListAuditAction(String token) throws Exception {
+        if (authService.find(token).isEmpty()) {
+            log.info("invalid token");
+            throw new Exception("invalid token");
+        }
+        int id = Integer.parseInt(authService.decodeJWT(token).getId());
+        return auditRepository.findAllById(id);
     }
 }

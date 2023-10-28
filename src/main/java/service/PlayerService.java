@@ -16,7 +16,4 @@ public interface PlayerService {
 
     void create(PlayerDTO dto) throws SQLException;
 
-    List<String> getListOperationAccount(String token) throws Exception;
-
-    List<String> getListAuditAction(String token) throws SQLException, Exception;
 }

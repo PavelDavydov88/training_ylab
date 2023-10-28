@@ -23,10 +23,10 @@ import static config.PropertyUtils.getProperty;
 public class AuditAspect {
     private final DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
     private final AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
-    private final AuditService auditService = new AuditServiceImpl(auditRepository);
     private final PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
     private final AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
     private final AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
+    private final AuditService auditService = new AuditServiceImpl(auditRepository, authService);
 
     public AuditAspect() throws IOException {
     }

@@ -23,12 +23,12 @@ import static config.PropertyUtils.getProperty;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
-    DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
-    PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
-    AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
-    AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
-    AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
-    ObjectMapper objectMapper = new ObjectMapper();
+    private DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(getProperty("db.url"), getProperty("db.user"), getProperty("db.password"));
+    private PlayerRepository playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
+    private AuthRepository authRepository = new AuthRepositoryImpl(dbConnectionProvider);
+    private AuditRepository auditRepository = new AuditRepositoryImpl(dbConnectionProvider);
+    private AuthService authService = new AuthServiceImpl(playerRepository, authRepository);
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public AuthServlet() throws IOException {
     }
