@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * класс для хранения audit
+ * Класс для хранения audit
  */
 @RequiredArgsConstructor
 public class AuditRepositoryImpl implements AuditRepository {
@@ -26,10 +26,10 @@ public class AuditRepositoryImpl implements AuditRepository {
             select * from wallet."audit" where "id_player" = ?""";
 
     /**
-     * метод сохраняет действия игрока
+     * Метод сохраняет действия игрока
      *
      * @param idPlayer    ID игрока
-     * @param historyText действия игрока
+     * @param historyText действие игрока
      * @throws SQLException
      */
     @Override
@@ -52,14 +52,14 @@ public class AuditRepositoryImpl implements AuditRepository {
     }
 
     /**
-     * метод возращает все действия игрока
+     * Метод возвращает все действия игрока
      *
      * @param id ID игрока
      * @return список действий игрока
      * @throws SQLException
      */
     @Override
-    public List<String> findAllById(long id) throws SQLException {
+    public List<String> findAllById(long id) throws Exception {
         List<String> listHistory = new ArrayList<>();
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -76,7 +76,7 @@ public class AuditRepositoryImpl implements AuditRepository {
             }
             return listHistory;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new Exception(e.getMessage());
         } finally {
             connection.close();
             preparedStatement.close();

@@ -8,29 +8,32 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import model.Player;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import model.PlayerDTO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Testcontainers
 public class PlayerRepositoryImplTest {
 
-    @Rule
+    @Container
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     PlayerRepository playerRepository;
     public static final String INSERT_PLAYER = """
-            INSERT INTO wallet."player" ("id", user_name, password, account) 
+            INSERT INTO wallet."player" ("id", user_name, password, account)
             VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)""";
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
         playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
@@ -51,20 +54,24 @@ public class PlayerRepositoryImplTest {
 
     @Test
     public void thatSavePlayer() throws SQLException {
-        Player defaultPlayer = getDefaultPlayer();
-        playerRepository.save(defaultPlayer);
-        Player player = playerRepository.findByNamePassword(defaultPlayer.getName(), defaultPlayer.getPassword());
-        assertThat(player.getId()).isEqualTo(11);
-        assertThat(player.getName()).isEqualTo("Ivan");
+        Player getDefaultPlayer = getDefaultPlayer();
+        playerRepository.save(getDefaultPlayer);
+        Player player = playerRepository.findByNamePassword(getDefaultPlayerDto());
+        assertEquals(11, player.getId());
+        assertEquals("Ivan", player.getName());
     }
 
     @Test
     public void thatFindById() throws SQLException {
         Player player = playerRepository.findById(10);
-        assertThat(player.getName()).isEqualTo("Pavel");
+        assertEquals("Pavel", player.getName());
     }
 
     private Player getDefaultPlayer() {
         return new Player(0, "Ivan", "789", 0);
+    }
+
+    private PlayerDTO getDefaultPlayerDto() {
+        return new PlayerDTO("Ivan", "789");
     }
 }

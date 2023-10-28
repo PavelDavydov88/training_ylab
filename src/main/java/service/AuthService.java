@@ -1,12 +1,13 @@
 package service;
 
 import io.jsonwebtoken.Claims;
+import model.PlayerDTO;
 
 import java.sql.SQLException;
 import java.util.Optional;
 
 public interface AuthService {
-    String doAuthorization(String name, String password) throws SQLException;
+    Optional<String> doAuthorization(PlayerDTO dto) throws SQLException;
 
     void exitAuthorization(String token) throws SQLException;
 

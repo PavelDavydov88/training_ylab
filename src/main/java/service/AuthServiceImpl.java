@@ -1,12 +1,13 @@
 package service;
 
+import aop.annotations.Audit;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import model.Player;
-import repository.AuditRepository;
+import model.PlayerDTO;
 import repository.AuthRepository;
 import repository.PlayerRepository;
 
@@ -18,62 +19,54 @@ import java.util.Date;
 import java.util.Optional;
 
 /**
- * класс предоставляет сервис по авторизации и завершения работы игрока
+ * Класс предоставляет сервис по авторизации и завершения работы игрока
  */
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final PlayerRepository playerRepository;
     private final AuthRepository authRepository;
-    private final AuditRepository auditRepository;
 
     /**
-     * метод авторизации игрока
+     * Метод авторизации игрока
      *
-     * @param name     имя игрока
-     * @param password пароль игрока
-     * @return токен
+     * @param dto DTO игрока
+     * @return возращает токен опционально
+     * @throws SQLException
      */
+    @Audit(success = "authorization completed successful")
     @Override
-    public String doAuthorization(String name, String password) throws SQLException {
-
+    public Optional<String> doAuthorization(PlayerDTO dto) throws SQLException {
         Player player = null;
         try {
-            player = playerRepository.findByNamePassword(name, password);
+            player = playerRepository.findByNamePassword(dto);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e.getMessage());
         }
-
-        if (player == null) {
-            return "this player doesn't exist";
-        } else {
-            String token = createJWT(String.valueOf(player.getId()), "test", player.toString(), System.currentTimeMillis());
-            authRepository.save(token);
-            auditRepository.save(player.getId(), "authorization completed successful");
-            return token;
-        }
+        String token = createJWT(String.valueOf(player.getId()), "test", player.toString(), System.currentTimeMillis());
+        authRepository.save(token);
+        return Optional.of(token);
     }
 
     /**
-     * метод по удалению токена из репозитория
+     * Метод для удаления токена из репозитория
      *
      * @param token токен игрока
      */
+    @Audit(success = "exit of authorization player done")
     @Override
     public void exitAuthorization(String token) throws SQLException {
         int idPlayer = Integer.parseInt(decodeJWT(token).getId());
-        Player player = null;
         try {
-            player = playerRepository.findById(idPlayer);
+            playerRepository.findById(idPlayer);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        auditRepository.save(player.getId(), "exit of authorization player done");
         authRepository.delete(token);
     }
 
     /**
-     * метод генерации токена
+     * Метод генерации токена
      *
      * @param id        id токена
      * @param issuer    эмитент токена
@@ -102,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * метод декодинга токена
+     * Метод декодинга токена
      *
      * @param jwt токен
      * @return расшифрованный токен
@@ -116,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * метод возращает токен из репозитория если такой токен существует
+     * Метод возвращает токен из репозитория если такой токен существует
      *
      * @param token токен
      * @return токен

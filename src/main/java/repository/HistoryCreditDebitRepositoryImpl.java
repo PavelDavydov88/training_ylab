@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * класс для хранения истории дебит/кредит
+ * Класс для хранения истории дебит/кредит
  */
 @RequiredArgsConstructor
 public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
@@ -23,7 +23,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
             select * from wallet."history-credit-debit" where "id_player" = ?""";
 
     /**
-     * метод сохраняет историю дебит/кредит игрока
+     * Метод сохраняет историю дебит/кредит игрока
      *
      * @param idPlayer    ID игрока
      * @param historyText история дебит/кредит игрока
@@ -49,7 +49,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
     }
 
     /**
-     * метод возращает истории дебит/кредит игрока
+     * Метод возвращает истории дебит/кредит игрока
      *
      * @param id ID игрока
      * @return список истории дебит/кредит игрока
@@ -73,7 +73,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
             }
             return listHistory;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e.getMessage());
         } finally {
             connection.close();
             preparedStatement.close();

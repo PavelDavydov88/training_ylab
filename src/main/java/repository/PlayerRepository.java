@@ -1,6 +1,7 @@
 package repository;
 
 import model.Player;
+import model.PlayerDTO;
 
 import java.sql.SQLException;
 
@@ -12,6 +13,6 @@ public interface PlayerRepository {
 
     Player update(Player player) throws SQLException;
 
-    Player findByNamePassword(String name, String password) throws SQLException;
+    Player findByNamePassword(PlayerDTO dto) throws SQLException;
 
 }

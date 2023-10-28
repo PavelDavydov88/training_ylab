@@ -1,8 +1,12 @@
 package service;
 
+import aop.annotations.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import model.AccountOperationDTO;
 import model.Player;
+import model.PlayerDTO;
+import model.mapper.PlayerMapper;
 import repository.HistoryCreditDebitRepository;
 import repository.PlayerRepository;
 
@@ -10,7 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * класс предоставляет сервис по работе с данными игрока
+ * Класс предоставляет сервис по работе с данными игрока
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -28,11 +32,12 @@ public class PlayerServiceImpl implements PlayerService {
      * @param token - токен игрока
      * @return значение счета игрока
      */
+    @Audit(success = "getting account")
     @Override
     public long getAccount(String token) throws SQLException {
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return 0;
+            throw new RuntimeException("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
         Player player = null;
@@ -41,126 +46,124 @@ public class PlayerServiceImpl implements PlayerService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        auditService.sendEvent(player.getId(), "getting account");
         return player.getAccount();
     }
 
     /**
-     * метод для выполнения операции debit
+     * Метод для выполнения операции debit
      *
-     * @param token             токен игрока
-     * @param valueDebitAccount значение списания со счета игрока
-     * @param transaction       уникальный номер транзакции
-     * @return возращает счета игрока
+     * @param token токен игрока
+     * @param dto   DTO операции игрока
+     * @return возращает счет игрока
      * @throws Exception в случае значение списания больше значения счета,
      *                   или невалидной транзакции
      */
+    @Audit(success = "debit operation completed")
     @Override
-    public long debitAccount(String token, long valueDebitAccount, Long transaction) throws Exception {
-        if (authService.find(token) == null) {
+    public long debitAccount(String token, AccountOperationDTO dto) throws Exception {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return 0;
+            throw new Exception("invalid token");
         }
         long id = Long.parseLong(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
 
-        if (transactionService.checkExist(transaction)) {
-            auditService.sendEvent(player.getId(), "debit operation have not been done, this transaction is exist");
-            throw new Exception(transaction + " this transaction is exist");
+        if (transactionService.checkExist(dto.getTransaction())) {
+            String auditMessage = "debit operation have not been done, this transaction is exist";
+            throw new Exception(dto.getTransaction() + auditMessage);
         }
-        transactionService.save(id, transaction);
-        if (player.getAccount() < valueDebitAccount) {
-            auditService.sendEvent(player.getId(), "debit operation have not been done, the player doesn't have enough money");
-            throw new Exception("the player doesn't have enough money");
+        transactionService.save(id, dto.getTransaction());
+        if (player.getAccount() < dto.getValueOperation()) {
+            String auditMessage = "debit operation have not been done, the player doesn't have enough money";
+            throw new Exception(auditMessage);
         }
-        player.setAccount(player.getAccount() - valueDebitAccount);
-        historyCreditDebitRepository.save(player.getId(), "debit account - " + valueDebitAccount);
-        auditService.sendEvent(player.getId(), "debit operation completed");
+        player.setAccount(player.getAccount() - dto.getValueOperation());
+        historyCreditDebitRepository.save(player.getId(), "debit account - " + dto.getValueOperation());
         player = playerRepository.update(player);
         return player.getAccount();
     }
 
     /**
-     * метод для выполнения операции credit
+     * Метод для выполнения операции credit
      *
-     * @param token              токен игрока
-     * @param valueCreditAccount значение списания со счета игрока
-     * @param transaction        уникальный номер транзакции
+     * @param token токен игрока
+     * @param dto   DTO операции игрока
      * @return возращает счета игрока
      * @throws Exception в случае невалидной транзакции
      */
+    @Audit(success = "credit operation completed")
     @Override
-    public long creditAccount(String token, long valueCreditAccount, Long transaction) throws Exception {
+    public long creditAccount(String token, AccountOperationDTO dto) throws Exception {
 
-        if (authService.find(token) == null) {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return 0;
+            throw new Exception("invalid token");
         }
         long id = Long.parseLong(authService.decodeJWT(token).getId());
         Player player = playerRepository.findById(id);
-        if (transactionService.checkExist(transaction)) {
-            auditService.sendEvent(player.getId(), "credit operation have not been done, this transaction is exist");
-            throw new Exception(transaction + " this transaction is exist");
+        if (transactionService.checkExist(dto.getTransaction())) {
+            String auditMessage = "debit operation have not been done, this transaction is exist";
+            throw new Exception(dto.getTransaction() + auditMessage);
         }
-        transactionService.save(id, transaction);
-        player.setAccount(player.getAccount() + valueCreditAccount);
-        historyCreditDebitRepository.save(player.getId(), "credit account + " + valueCreditAccount);
-        auditService.sendEvent(player.getId(), "credit operation completed");
+        transactionService.save(id, dto.getTransaction());
+        player.setAccount(player.getAccount() + dto.getValueOperation());
+        historyCreditDebitRepository.save(player.getId(), "credit account + " + dto.getValueOperation());
         player = playerRepository.update(player);
         return player.getAccount();
     }
 
     /**
-     * метод создания игрока
+     * Метод создания игрока
      *
-     * @param name     имя
-     * @param password пароль
+     * @param dto DTO данные для создания игрока (name, password)
      * @throws SQLException
      */
+
+    @Audit(success = "registration completed successful")
     @Override
-    public void create(String name, String password) throws SQLException {
-        Player inputPlayer = new Player(0, name, password, 0);
+    public void create(PlayerDTO dto) throws SQLException {
         try {
-            playerRepository.save(inputPlayer);
-            Player player = playerRepository.findByNamePassword(name, password);
-            auditService.sendEvent(player.getId(), "registration completed successful");
+            Player playerInput = PlayerMapper.INSTANCE.toModel(dto);
+            playerRepository.save(playerInput);
+//            Player player = playerRepository.findByNamePassword(dto);
+//            auditService.sendEvent(player.getId(), "registration completed successful");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLException(e);
         }
     }
 
     /**
-     * метод для получения истории пополнения/снятия средств игроком
+     * Метод для получения истории пополнения/снятия средств игроком
      *
      * @param token токен игрока
      * @return лист операций игрока
      */
+    @Audit(success = "operation request history of credit/debit operations")
     @Override
-    public List<String> getListOperationAccount(String token) throws SQLException {
-        if (authService.find(token) == null) {
+    public List<String> getListOperationAccount(String token) throws Exception {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return null;
+            throw new Exception("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
-        auditService.sendEvent(id, "operation request history of credit/debit operations");
         try {
             return historyCreditDebitRepository.findById(id);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new Exception(e.getMessage());
         }
     }
 
     /**
-     * метод для получения аудита действий игрока
+     * Метод для получения аудита действий игрока
      *
      * @param token токен игрока
      * @return лист операций игрока
      */
     @Override
-    public List<String> getListAuditAction(String token) throws SQLException {
-        if (authService.find(token) == null) {
+    public List<String> getListAuditAction(String token) throws Exception {
+        if (authService.find(token).isEmpty()) {
             log.info("invalid token");
-            return null;
+            throw new Exception("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
         return auditService.getEvents(id);

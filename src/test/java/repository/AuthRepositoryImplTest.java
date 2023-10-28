@@ -7,27 +7,31 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Testcontainers
 public class AuthRepositoryImplTest {
-    @Rule
+    @Container
     public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
 
     AuthRepository authRepository;
     public static final String INSERT_TOKEN = """
             INSERT INTO wallet."auth" ("id" ,"token") VALUES (nextval( 'wallet.sequence_auth'), '1')""";
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
         authRepository = new AuthRepositoryImpl(dbConnectionProvider);
@@ -49,20 +53,20 @@ public class AuthRepositoryImplTest {
     @Test
     public void thatSaveToken() throws SQLException {
         authRepository.save("2");
-        String token = String.valueOf(authRepository.find("2"));
-        assertThat(token).isEqualTo("2");
+        Optional<String> token = authRepository.find("2");
+        assertEquals("2", token.get());
     }
 
     @Test
     public void thatFindByToken() throws SQLException {
-        String token = String.valueOf(authRepository.find("1"));
-        assertThat(token).isEqualTo("1");
+        Optional<String> token = authRepository.find("1");
+        assertEquals("1", token.get());
     }
 
     @Test
     public void thatDeleteToken() throws SQLException {
         authRepository.delete("1");
-        String token = String.valueOf(authRepository.find("1"));
-        assertThat(token).isNull();
+        Optional<String> token = authRepository.find("1");
+        assertTrue(token.isEmpty());
     }
 }

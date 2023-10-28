@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 /**
- * класс для хранения auth
+ * Класс для хранения token
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -28,7 +28,7 @@ public class AuthRepositoryImpl implements AuthRepository {
             delete from wallet."auth" where "token" = ?""";
 
     /**
-     * метод сохраняет токен
+     * Метод сохраняет токен
      *
      * @param token токен
      * @throws SQLException
@@ -51,10 +51,10 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     /**
-     * метод возращает токен
+     * Метод возвращает токен
      *
      * @param token токен
-     * @return
+     * @return токен опционально
      * @throws SQLException
      */
     @Override
@@ -82,7 +82,7 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     /**
-     * метод удаляет токен
+     * Метод удаляет токен
      *
      * @param token
      * @throws SQLException
