@@ -11,8 +11,6 @@ import org.davydov.service.AuditService;
 import org.davydov.service.AuthService;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
  * Аспект для аудита
  */

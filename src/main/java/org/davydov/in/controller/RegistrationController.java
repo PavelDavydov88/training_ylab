@@ -21,7 +21,9 @@ public class RegistrationController {
     public ResponseEntity<?> registration(@RequestBody PlayerDTO dto) {
         try {
             ValidationUtils.isEmptyOrNull(dto.getName());
+            ValidationUtils.isEmptyOrNull(dto.getPassword());
             ValidationUtils.size(2, 10, dto.getName());
+            ValidationUtils.size(3, 10, dto.getPassword());
             playerService.create(dto);
             return new ResponseEntity<>(new ResponseDTO("Player created!"), HttpStatus.CREATED);
         } catch (Exception e) {

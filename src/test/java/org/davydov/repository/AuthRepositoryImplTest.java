@@ -1,14 +1,12 @@
 package org.davydov.repository;
 
-import org.davydov.config.DBConnectionProvider;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import org.davydov.repository.AuthRepository;
-import org.davydov.repository.AuthRepositoryImpl;
+import org.davydov.config.DBConnectionProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -36,6 +34,9 @@ public class AuthRepositoryImplTest {
     @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider();
+        dbConnectionProvider.setUsername(postgresContainer.getUsername());
+        dbConnectionProvider.setPassword(postgresContainer.getPassword());
+        dbConnectionProvider.setUrl(postgresContainer.getJdbcUrl());
         authRepository = new AuthRepositoryImpl(dbConnectionProvider);
         Connection connection = DriverManager
                 .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());

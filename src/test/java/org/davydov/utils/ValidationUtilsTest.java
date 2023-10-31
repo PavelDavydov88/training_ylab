@@ -1,9 +1,8 @@
 package org.davydov.utils;
 
-import org.davydov.utils.ValidationUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ValidationUtilsTest {
 

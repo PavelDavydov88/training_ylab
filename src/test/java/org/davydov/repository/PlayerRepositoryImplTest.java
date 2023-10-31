@@ -1,16 +1,14 @@
 package org.davydov.repository;
 
-import org.davydov.config.DBConnectionProvider;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import org.davydov.config.DBConnectionProvider;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
-import org.davydov.repository.PlayerRepository;
-import org.davydov.repository.PlayerRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -38,6 +36,9 @@ public class PlayerRepositoryImplTest {
     @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider();
+        dbConnectionProvider.setUsername(postgresContainer.getUsername());
+        dbConnectionProvider.setPassword(postgresContainer.getPassword());
+        dbConnectionProvider.setUrl(postgresContainer.getJdbcUrl());
         playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
         Connection connection = DriverManager
                 .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
@@ -48,6 +49,7 @@ public class PlayerRepositoryImplTest {
         database.setDefaultSchemaName("liquibase");
         Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
         liquibase.update();
+
         connection = DriverManager
                 .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
         statement = connection.createStatement();

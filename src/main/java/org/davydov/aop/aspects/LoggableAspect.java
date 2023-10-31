@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggableAspect {
 
-    @Around("execution(* *(..))")
+    @Around("execution(* org.davydov..*.*(..))")
     public Object logging(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         log.info("Calling method {}", proceedingJoinPoint.getSignature());
         long startTime = System.currentTimeMillis();

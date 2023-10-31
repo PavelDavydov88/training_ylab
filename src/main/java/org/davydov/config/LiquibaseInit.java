@@ -16,7 +16,7 @@ import java.sql.Statement;
 
 @Data
 @Component
-public class UtilLiquibase {
+public class LiquibaseInit {
 
     @Value("${db.changeLog}")
     private String changeLog;
@@ -62,7 +62,5 @@ public class UtilLiquibase {
             }
         }
     }
-
-
 }
 

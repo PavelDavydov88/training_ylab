@@ -1,7 +1,5 @@
 package org.davydov.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
@@ -25,22 +23,13 @@ public class WebConfig implements WebMvcConfigurer {
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
     }
 
-//    @Value("${db.changeLog}")
-//    private String changeLog;
-//    @Value("${db.url}")
-//    private String url;
-//    @Value("${db.user}")
-//    private String username;
-//    @Value("${db.password}")
-//    private String password;
-
-//    @Bean
-//    public UtilLiquibase utilLiquibase() {
-//        UtilLiquibase utilLiquibase = new UtilLiquibase();
-//        utilLiquibase.initLiquibase();
-//        return utilLiquibase;
+//    private ApiInfo getApiInfo(){
+//        return new ApiInfo("book store", "sample desk", "v1", "", "co", "", "");
 //    }
-
-
+//
+//    @Bean
+//    public Docket swaggerCommonConfiguration(){
+//        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(getClass().getPackage().getName())).paths(PathSelectors.any()).build().apiInfo(getApiInfo());
+//    }
 }
 

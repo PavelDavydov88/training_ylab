@@ -1,14 +1,12 @@
 package org.davydov.repository;
 
-import org.davydov.config.DBConnectionProvider;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import org.davydov.repository.TransactionRepository;
-import org.davydov.repository.TransactionRepositoryImpl;
+import org.davydov.config.DBConnectionProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -37,6 +35,9 @@ public class TransactionRepositoryImplTest {
     @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider();
+        dbConnectionProvider.setUsername(postgresContainer.getUsername());
+        dbConnectionProvider.setPassword(postgresContainer.getPassword());
+        dbConnectionProvider.setUrl(postgresContainer.getJdbcUrl());
         transactionRepository = new TransactionRepositoryImpl(dbConnectionProvider);
         Connection connection = DriverManager
                 .getConnection(postgresContainer.getJdbcUrl(),
