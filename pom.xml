@@ -29,7 +29,7 @@
         <jaxb.version>2.3.1</jaxb.version>
         <slf4j.version>1.7.21</slf4j.version>
         <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
-        <spring-framework.version>6.0.13</spring-framework.version>
+        <spring-framework.version>5.3.30</spring-framework.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <jakarta.annotation>2.1.1</jakarta.annotation>
     </properties>
@@ -207,23 +207,38 @@
             <version>2.8.0</version>
         </dependency>
 
-        <!--        <dependency>-->
-<!--            <groupId>io.springfox</groupId>-->
-<!--            <artifactId>springfox-swagger2</artifactId>-->
-<!--            <version>2.6.1</version>-->
-<!--        </dependency>-->
+                <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.2.2</version>
+        </dependency>
 <!--        <dependency>-->
-<!--            <groupId>io.springfox</groupId>-->
-<!--            <artifactId>springfox-swagger-ui</artifactId>-->
-<!--            <version>2.2.2</version>-->
+<!--            <groupId>org.springdoc</groupId>-->
+<!--            <artifactId>springdoc-openapi-ui</artifactId>-->
+<!--            <version>1.5.10</version>-->
 <!--        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.15.3</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>io.swagger.core.v3</groupId>-->
+<!--            <artifactId>swagger-annotations</artifactId>-->
+<!--            <version>2.1.6</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springdoc</groupId>-->
+<!--            <artifactId>springdoc-openapi-ui</artifactId>-->
+<!--            <version>1.5.2</version>-->
+<!--        </dependency>-->
 
 <!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-modules-base &ndash;&gt;-->
 <!--        <dependency>-->
