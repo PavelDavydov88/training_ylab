@@ -13,12 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Контроллер для выполнения кредита игрока
+ */
 @RestController
 @RequiredArgsConstructor
 public class CreditController {
 
     private final PlayerService playerService;
 
+    /**
+     * Метод для выполнения кредита игрока
+     *
+     * @param headers заголовок с токеном
+     * @param dto     DTO операции со счетом
+     * @return счет игрока
+     */
     @PostMapping("/credit")
     public ResponseEntity<?> credit(@RequestHeader Map<String, String> headers, @RequestBody AccountOperationDTO dto) {
         String token = headers.get("token");

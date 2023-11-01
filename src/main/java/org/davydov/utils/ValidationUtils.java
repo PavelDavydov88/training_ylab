@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public final class ValidationUtils {
+
     /**
      * Метод проверки параметра на empty и null
      *

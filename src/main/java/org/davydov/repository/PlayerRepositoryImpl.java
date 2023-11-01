@@ -1,6 +1,7 @@
 package org.davydov.repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.davydov.config.DBConnectionProvider;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
@@ -12,21 +13,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Класс для хранения игрока
+ * DAO for Player
  */
 @Repository
+@Slf4j
 @RequiredArgsConstructor
 public class PlayerRepositoryImpl implements PlayerRepository {
 
     private final DBConnectionProvider dbConnectionProvider;
-    public static final String UPDATE_PLAYER = """
+    private static final String UPDATE_PLAYER = """
             UPDATE wallet."player" SET account = ? WHERE id = ?""";
-    public static final String INSERT_PLAYER = """
+    private static final String INSERT_PLAYER = """
             INSERT INTO wallet."player" ("id", user_name, password, account) 
-            VALUES (nextval( 'wallet.sequence_player'), ?, ?, ?)""";
-    public static final String SELECT_FIND_BY_ID_PLAYER = """
+            VALUES (nextval('wallet.sequence_player'), ?, ?, ?)""";
+    private static final String SELECT_FIND_BY_ID_PLAYER = """
             select * from wallet."player" where id = ?""";
-    public static final String SELECT_FIND_BY_NAME_PASSWORD = """
+    private static final String SELECT_FIND_BY_NAME_PASSWORD = """
             select * from wallet."player" where user_name=? and "password"=?""";
 
     /**
@@ -37,20 +39,14 @@ public class PlayerRepositoryImpl implements PlayerRepository {
      */
     @Override
     public void save(Player inputPlayer) throws SQLException {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        try {
-            connection = dbConnectionProvider.getConnection();
-            preparedStatement = connection.prepareStatement(INSERT_PLAYER);
+        try (Connection connection = dbConnectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_PLAYER)) {
             preparedStatement.setString(1, inputPlayer.getName());
             preparedStatement.setString(2, inputPlayer.getPassword());
             preparedStatement.setInt(3, 0);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            connection.close();
-            preparedStatement.close();
         }
     }
 
@@ -62,35 +58,25 @@ public class PlayerRepositoryImpl implements PlayerRepository {
      * @throws SQLException
      */
     @Override
-    public Player findById(long id) throws SQLException {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-        try {
-            connection = dbConnectionProvider.getConnection();
-            ;
-            preparedStatement = connection.prepareStatement(SELECT_FIND_BY_ID_PLAYER);
+    public Player findById(long id) {
+        try (Connection connection = dbConnectionProvider.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FIND_BY_ID_PLAYER)) {
             preparedStatement.setLong(1, id);
-            resultSet = preparedStatement.executeQuery();
-            String name = null, password = null;
-            long account = 0, idResult = 0;
-            if (resultSet.next()) {
-                idResult = resultSet.getLong("id");
-                name = resultSet.getString("user_name");
-                password = resultSet.getString("password");
-                account = resultSet.getLong("account");
-
-            } else {
-                System.out.println("Record not found.");
+            try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                String name = null, password = null;
+                long account = 0, idResult = 0;
+                if (resultSet.next()) {
+                    idResult = resultSet.getLong("id");
+                    name = resultSet.getString("user_name");
+                    password = resultSet.getString("password");
+                    account = resultSet.getLong("account");
+                } else {
+                    log.error("Record not found.");
+                }
+                return new Player(idResult, name, password, account);
             }
-            return new Player(idResult, name, password, account);
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            connection.close();
-            preparedStatement.close();
-            resultSet.close();
         }
     }
 
@@ -120,7 +106,7 @@ public class PlayerRepositoryImpl implements PlayerRepository {
                 passwordResult = resultSet.getString("password");
                 accountResult = resultSet.getLong("account");
             } else {
-               throw new SQLException("this player doesn't exist");
+                throw new SQLException("this player doesn't exist");
             }
             return new Player(idResult, nameResult, passwordResult, accountResult);
         } catch (SQLException e) {

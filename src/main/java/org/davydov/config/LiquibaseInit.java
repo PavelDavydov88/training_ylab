@@ -1,20 +1,24 @@
 package org.davydov.config;
 
-import jakarta.annotation.PostConstruct;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Класс для инициализации liquibase
+ */
 @Data
+@Slf4j
 @Component
 public class LiquibaseInit {
 
@@ -26,7 +30,12 @@ public class LiquibaseInit {
     private String username;
     @Value("${db.password}")
     private String password;
+    private static final String CREATE_SCHEMA = "CREATE SCHEMA IF NOT EXISTS liquibase";
 
+
+    /**
+     * Метод для инициализации liquibase
+     */
     @PostConstruct
     public void initLiquibase() {
         DBConnectionProvider dbConnectionProvider = new DBConnectionProvider();
@@ -38,28 +47,16 @@ public class LiquibaseInit {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        Connection connection = null;
-        Database database = null;
-        Statement statement = null;
-        try {
-            connection = dbConnectionProvider.getConnection();
-            database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
-            statement = connection.createStatement();
-            statement.executeUpdate(sql);
+        try (Connection connection = dbConnectionProvider.getConnection();
+             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate(CREATE_SCHEMA);
             database.setDefaultSchemaName("liquibase");
             Liquibase liquibase = new Liquibase(changeLog, new ClassLoaderResourceAccessor(), database);
             liquibase.update();
-            System.out.println("Миграции успешно выполнены!");
+            log.info("Миграции успешно выполнены!");
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                connection.close();
-                statement.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }

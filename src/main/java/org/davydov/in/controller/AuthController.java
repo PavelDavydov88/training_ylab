@@ -13,12 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+/**
+ * Контроллер для предоставления auth
+ */
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * Метод для предоставления auth
+     *
+     * @param dto DTO игрока
+     * @return токен
+     */
     @PostMapping("/auth")
     public ResponseEntity<?> auth(@RequestBody PlayerDTO dto) {
         try {

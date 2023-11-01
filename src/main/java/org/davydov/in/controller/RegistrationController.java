@@ -1,6 +1,5 @@
 package org.davydov.in.controller;
 
-import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.davydov.model.PlayerDTO;
 import org.davydov.model.ResponseDTO;
@@ -12,27 +11,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-//@Api(tags = "Product Controller")
-//@SwaggerDefinition(tags = {
-//        @Tag(name = "Product Controller", description = "Write description here")
-//})
-@Api(value = "RegistrationController", tags = {"Product Controller"})
-//@SwaggerDefinition(tags = {
-//        @Tag(name = "Product Controller", description = "Write description here")
-//})
+/**
+ * Контроллер для регистрации игрока
+ */
 @RestController
 @RequiredArgsConstructor
 public class RegistrationController {
 
     private final PlayerService playerService;
 
-
-    @ApiOperation(value = "List of all products", response = PlayerDTO.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "404 error")
-    })
-//    @ApiOperation(value = "registration of player")
+    /**
+     * Метод для регистрации игрока
+     *
+     * @param dto DTO игрока
+     * @return уведомление о регистрации игрока
+     */
     @PostMapping("/registration")
     public ResponseEntity<?> registration(@RequestBody PlayerDTO dto) {
         try {

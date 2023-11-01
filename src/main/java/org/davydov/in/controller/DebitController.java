@@ -13,12 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Контроллер для выполнения дебита игрока
+ */
 @RestController
 @RequiredArgsConstructor
 public class DebitController {
 
     private final PlayerService playerService;
 
+    /**
+     * Метод для выполнения дебита игрока
+     *
+     * @param headers заголовок с токеном
+     * @param dto     DTO операции со счетом
+     * @return счет игрока
+     */
     @PostMapping("/debit")
     public ResponseEntity<?> debit(@RequestHeader Map<String, String> headers, @RequestBody AccountOperationDTO dto) {
         String token = headers.get("token");

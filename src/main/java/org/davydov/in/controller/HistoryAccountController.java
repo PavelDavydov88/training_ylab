@@ -13,12 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Контроллер для предоставления истории действий со счетом игрока
+ */
 @RestController
 @RequiredArgsConstructor
-public class HistoryAccountController {
+public class
+HistoryAccountController {
 
     private final HistoryCreditDebitService historyCreditDebitService;
 
+    /**
+     * Метод для предоставления истории действий со счетом игрока
+     *
+     * @param headers заголовок с токеном
+     * @return лист истории действий со счетом игрока
+     */
     @PostMapping("/history")
     public ResponseEntity<?> history(@RequestHeader Map<String, String> headers) {
         String token = headers.get("token");

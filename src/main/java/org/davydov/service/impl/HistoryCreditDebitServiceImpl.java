@@ -25,8 +25,8 @@ public class HistoryCreditDebitServiceImpl implements HistoryCreditDebitService 
     /**
      * Метод отправляет действие со счетом игрока для записи в репозиторий
      *
-     * @param playerId
-     * @param historyText
+     * @param playerId    ID игрока
+     * @param historyText описание события
      * @throws SQLException
      */
     @Override

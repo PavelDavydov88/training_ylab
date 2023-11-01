@@ -13,12 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Контроллер для предоставления аудита игрока
+ */
 @RestController
 @RequiredArgsConstructor
 public class AuditController {
 
     private final AuditService auditService;
 
+    /**
+     * Метод для предоставления аудита игрока
+     *
+     * @param headers заголовок с токеном
+     * @return лист аудита игрока
+     */
     @PostMapping("/audit")
     public ResponseEntity<?> audit(@RequestHeader Map<String, String> headers) {
         String token = headers.get("token");

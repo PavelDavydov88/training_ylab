@@ -11,12 +11,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Контроллер для предоставления счета игрока
+ */
 @RestController
 @RequiredArgsConstructor
 public class AccountController {
 
     private final PlayerService playerService;
 
+    /**
+     * Метод для предоставления счета игрока
+     *
+     * @param headers заголовок с токеном
+     * @return значение счета
+     */
     @PostMapping("/account")
     public ResponseEntity<?> account(@RequestHeader Map<String, String> headers) {
         String token = headers.get("token");
