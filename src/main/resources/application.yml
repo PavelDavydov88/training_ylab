@@ -6,3 +6,4 @@ db.url: jdbc:postgresql://localhost:15432/ylabuser
 db.user: ylabuser
 db.password: 1234
 db.changeLog: db/changelog/changelog.xml
+logging: execution(* org.davydov..*.*(..))
