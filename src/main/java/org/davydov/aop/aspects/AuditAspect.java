@@ -5,9 +5,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.davydov.aop.annotations.Audit;
-import org.davydov.model.AccountOperationDTO;
-import org.davydov.model.AuthDTO;
-import org.davydov.model.PlayerDTO;
 import org.davydov.service.AuditService;
 import org.springframework.stereotype.Component;
 
@@ -28,21 +25,10 @@ public class AuditAspect {
         long playerId = 0L;
         try {
             result = joinPoint.proceed();
-            System.out.println("result " + result);
-            if (joinPoint.getArgs()[0] instanceof AuthDTO authDTO) {
-                playerId = authDTO.getIdPlayer();
+            if (joinPoint.getArgs()[0] instanceof Long idPlayer) {
+                playerId = idPlayer;
             } else {
-                if (joinPoint.getArgs()[0] instanceof PlayerDTO) {
-                    playerId = (long) result;
-                } else {
-                    if (joinPoint.getArgs()[0] instanceof AccountOperationDTO accountOperationDTO) {
-                        playerId = accountOperationDTO.getIdPlayer();
-                    } else {
-                        if (joinPoint.getArgs()[0] instanceof Long idPlayer) {
-                            playerId = idPlayer;
-                        }
-                    }
-                }
+                playerId = (long) result;
             }
             if (playerId != 0L) {
                 auditService.sendEvent(playerId, annotation.success());

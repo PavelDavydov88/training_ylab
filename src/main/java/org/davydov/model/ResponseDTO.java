@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseDTO {
-    private Long idPlayer;
-    private String token;
+    private String response;
 }

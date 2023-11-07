@@ -102,6 +102,17 @@
             <artifactId>logging-starter</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>audit-starter</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--        <dependency>-->
+<!--            <groupId>org.example</groupId>-->
+<!--            <artifactId>audit-starter</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
 
     </dependencies>
     <build>

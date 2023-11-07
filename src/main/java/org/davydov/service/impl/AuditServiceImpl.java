@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.davydov.repository.AuditRepository;
 import org.davydov.service.AuditService;
-import org.davydov.service.AuthService;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -19,7 +18,6 @@ import java.util.List;
 public class AuditServiceImpl implements AuditService {
 
     private final AuditRepository auditRepository;
-    private final AuthService authService;
 
     /**
      * Метод отправляет события для записи в репозиторий
@@ -36,16 +34,11 @@ public class AuditServiceImpl implements AuditService {
     /**
      * Метод для получения аудита действий игрока
      *
-     * @param token токен игрока
+     * @param idPlayer токен игрока
      * @return лист операций игрока
      */
     @Override
-    public List<String> getListAuditAction(String token) throws Exception {
-        if (authService.find(token).isEmpty()) {
-            log.info("invalid token");
-            throw new Exception("invalid token");
-        }
-        int id = Integer.parseInt(authService.decodeJWT(token).getId());
-        return auditRepository.findAllById(id);
+    public List<String> getListAuditAction(long idPlayer) throws Exception {
+        return auditRepository.findAllById(idPlayer);
     }
 }

@@ -8,13 +8,11 @@ import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
 import org.davydov.model.mapper.PlayerMapper;
 import org.davydov.repository.PlayerRepository;
-import org.davydov.service.AuthService;
-import org.davydov.service.HistoryCreditDebitService;
-import org.davydov.service.PlayerService;
-import org.davydov.service.TransactionService;
+import org.davydov.service.*;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Класс предоставляет сервис по работе с данными игрока
@@ -28,6 +26,7 @@ public class PlayerServiceImpl implements PlayerService {
     private final TransactionService transactionService;
     private final AuthService authService;
     private final HistoryCreditDebitService historyCreditDebitService;
+    private final AuditService auditService;
 
     /**
      * Метод возвращает значение счета игрока
@@ -61,15 +60,16 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод для выполнения операции debit
      *
-     * @param dto   DTO операции игрока
-     * @param token токен игрока
+     * @param idPlayer
+     * @param dto      DTO операции игрока
+     * @param token    токен игрока
      * @return возращает счет игрока
      * @throws Exception в случае значение списания больше значения счета,
      *                   или невалидной транзакции
      */
     @Audit(success = "debit operation completed")
     @Override
-    public long debitAccount(AccountOperationDTO dto, String token) throws Exception {
+    public long debitAccount(long idPlayer, AccountOperationDTO dto, String token) throws Exception {
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
             throw new Exception("invalid token");
@@ -95,14 +95,15 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод для выполнения операции credit
      *
-     * @param dto   DTO операции игрока
-     * @param token токен игрока
+     * @param idPlayer
+     * @param dto      DTO операции игрока
+     * @param token    токен игрока
      * @return возращает счета игрока
      * @throws Exception в случае невалидной транзакции
      */
     @Audit(success = "credit operation completed")
     @Override
-    public long creditAccount(AccountOperationDTO dto, String token) throws Exception {
+    public long creditAccount(long idPlayer, AccountOperationDTO dto, String token) throws Exception {
 
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
@@ -140,4 +141,18 @@ public class PlayerServiceImpl implements PlayerService {
         }
     }
 
+    @Audit(success = "operation request audit of player")
+    @Override
+    public List<String> getListAuditAction(long idPlayer, String token) throws Exception {
+        if (authService.find(token).isEmpty()) {
+            log.info("invalid token");
+            throw new Exception("invalid token");
+        }
+        int id = Integer.parseInt(authService.decodeJWT(token).getId());
+        if (id != idPlayer) {
+            log.info("invalid token");
+            throw new Exception("invalid token");
+        }
+        return auditService.getListAuditAction(id);
+    }
 }

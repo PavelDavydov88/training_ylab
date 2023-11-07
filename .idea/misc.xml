@@ -9,6 +9,7 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/logging-starter/pom.xml" />
+        <option value="$PROJECT_DIR$/audit-starter/pom.xml" />
       </list>
     </option>
   </component>

@@ -15,10 +15,6 @@ import lombok.NoArgsConstructor;
 public class AccountOperationDTO {
     @Min(1)
     @Max(Long.MAX_VALUE)
-    private long idPlayer;
-
-    @Min(1)
-    @Max(Long.MAX_VALUE)
     private long valueOperation;
 
     @Min(1)

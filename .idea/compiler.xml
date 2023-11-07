@@ -8,12 +8,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="logging-starter" />
+        <module name="audit-starter" />
         <module name="training_ylab" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="audit-starter" options="-parameters" />
       <module name="logging-starter" options="-parameters" />
       <module name="training_ylab" options="-parameters" />
     </option>

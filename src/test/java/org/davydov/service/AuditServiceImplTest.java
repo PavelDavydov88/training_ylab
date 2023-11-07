@@ -11,9 +11,8 @@ import static org.mockito.Mockito.*;
 public class AuditServiceImplTest {
 
     private final AuditRepository auditRepository = mock(AuditRepository.class);
-    private final AuthService authService = mock(AuthService.class);
 
-    AuditService auditService = new AuditServiceImpl(auditRepository, authService);
+    AuditService auditService = new AuditServiceImpl(auditRepository);
 
     @Test
     public void testThatSendEvent() throws SQLException {

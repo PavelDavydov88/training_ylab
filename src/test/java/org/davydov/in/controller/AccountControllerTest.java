@@ -1,11 +1,9 @@
 package org.davydov.in.controller;
 
 import com.jayway.jsonpath.JsonPath;
-import org.davydov.model.IdPlayerDTO;
 import org.davydov.service.PlayerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -34,21 +32,19 @@ class AccountControllerTest {
     void thatGetAccount() throws Exception {
         String token = "test";
         doReturn(100L).when(playerService).getAccount(anyLong(), anyString());
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/account")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(new IdPlayerDTO(1L)))
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/account/1")
                         .header("token", token))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Integer responseAccount = JsonPath.read(result.getResponse().getContentAsString(), "$.account");
-        assertEquals(100, responseAccount);
+        String responseAccount = JsonPath.read(result.getResponse().getContentAsString(), "$.response");
+        assertEquals("100", responseAccount);
         verify(playerService).getAccount(1L, token);
     }
 
     @Test
     void thatGetAccountFailure() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/account")
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/1")
                         .header("not a token", ""))
                 .andExpect(status().isBadRequest());
     }
