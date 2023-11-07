@@ -1,5 +1,6 @@
 package org.davydov.service;
 
+import org.davydov.model.AuthDTO;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
 import org.davydov.repository.AuthRepository;
@@ -25,7 +26,7 @@ public class AuthServiceImplTest {
     @Test
     public void testThatDoAuthorization() throws SQLException {
         when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(new Player(1, "Pavel", "password", 0));
-        Optional<String> token = authService.doAuthorization(new PlayerDTO("Pavel", "password"));
+        Optional<String> token = authService.doAuthorization(new AuthDTO("Pavel", "password", 1));
         String player = authService.decodeJWT(token.get()).getSubject();
         assertEquals("id=1, name=Pavel, account=0", player);
     }
@@ -36,7 +37,7 @@ public class AuthServiceImplTest {
                 "wrongName", "wrongPassword"))).
                 thenThrow(new SQLException("this player doesn't exist"));
         assertThrows(SQLException.class, () -> authService.doAuthorization(
-                new PlayerDTO("wrongName", "wrongPassword")));
+                new AuthDTO("wrongName", "wrongPassword", 100)));
 
     }
 }

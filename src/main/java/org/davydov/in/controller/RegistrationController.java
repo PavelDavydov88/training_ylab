@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.davydov.model.PlayerDTO;
 import org.davydov.model.ResponseDTO;
+import org.davydov.model.ResponseError;
 import org.davydov.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +31,11 @@ public class RegistrationController {
     @PostMapping("/registration")
     public ResponseEntity<?> registration(@RequestBody @Valid PlayerDTO dto) {
         try {
-            playerService.create(dto);
-            return new ResponseEntity<>(new ResponseDTO("Player created!"), HttpStatus.CREATED);
+            long idPlayer = playerService.create(dto);
+            return new ResponseEntity<>(new ResponseDTO(idPlayer, ""), HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseError(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

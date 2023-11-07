@@ -1,8 +1,9 @@
 package org.davydov.in.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.davydov.model.AccountDTO;
 import org.davydov.model.AccountOperationDTO;
-import org.davydov.model.ResponseDTO;
+import org.davydov.model.ResponseError;
 import org.davydov.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,17 +31,17 @@ public class DebitController {
      * @return счет игрока
      */
     @PostMapping("/debit")
-    public ResponseEntity<?> debit(@RequestHeader Map<String, String> headers, @RequestBody AccountOperationDTO dto) {
+    public ResponseEntity<?> debit(@RequestBody AccountOperationDTO dto, @RequestHeader Map<String, String> headers) {
         String token = headers.get("token");
         try {
             if (token == null) {
                 throw new RuntimeException("token is null");
             }
-            Long accountPlayer = playerService.debitAccount(token, dto);
-            return new ResponseEntity<>(new ResponseDTO(accountPlayer.toString()), HttpStatus.OK);
+            Long accountPlayer = playerService.debitAccount(dto, token);
+            return new ResponseEntity<>(new AccountDTO(accountPlayer), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseError(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

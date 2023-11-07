@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Клас DTO для ответа request
+ * Клас DTO для account player
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseDTO {
-    private Long idPlayer;
-    private String token;
+public class AccountDTO {
+    private Long account;
 }

@@ -1,5 +1,7 @@
 package org.davydov.model;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseDTO {
-    private Long idPlayer;
-    private String token;
+public class IdPlayerDTO {
+    @Min(1)
+    @Max(Long.MAX_VALUE)
+    private long idPlayer;
 }

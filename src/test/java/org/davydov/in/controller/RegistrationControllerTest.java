@@ -30,12 +30,11 @@ class RegistrationControllerTest {
     @Test
     public void testSuccessfulPlayerCreation() throws Exception {
         PlayerDTO player = new PlayerDTO("test", "test");
-        doNothing().when(playerService).create(player);
+        doReturn(1L).when(playerService).create(player);
         mockMvc.perform(post("/registration")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(player)))
                 .andExpect(status().isCreated());
-
         verify(playerService).create(player);
     }
 
@@ -49,3 +48,4 @@ class RegistrationControllerTest {
                 .andExpect(status().isBadRequest());
     }
 }
+

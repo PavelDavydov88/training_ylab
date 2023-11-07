@@ -1,6 +1,6 @@
 package org.davydov.in.controller;
 
-import org.davydov.model.PlayerDTO;
+import org.davydov.model.AuthDTO;
 import org.davydov.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,29 +20,32 @@ class AuthControllerTest {
     private MockMvc mockMvc;
     private AuthService authService;
     private ObjectMapper mapper;
+
     @BeforeEach
     void setUp() {
         authService = mock(AuthService.class);
         mockMvc = standaloneSetup(new AuthController(authService)).build();
         mapper = new ObjectMapper();
     }
+
     @Test
     void thatSuccessfulAuth() throws Exception {
-        PlayerDTO player = new PlayerDTO("test", "test");
-        doReturn(Optional.of("test token")).when(authService).doAuthorization(player);
+        AuthDTO authDTO = new AuthDTO("test", "test", 1L);
+        doReturn(Optional.of("test token")).when(authService).doAuthorization(authDTO);
         mockMvc.perform(post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(player)))
+                        .content(mapper.writeValueAsString(authDTO)))
                 .andExpect(status().isOk());
-        verify(authService).doAuthorization(player);
+        verify(authService).doAuthorization(authDTO);
     }
+
     @Test
     public void thatAuthFailure() throws Exception {
-        PlayerDTO player = new PlayerDTO("test", "test");
+        AuthDTO authDTO = new AuthDTO("test", "test", 1L);
         doThrow(new RuntimeException("Some text error")).when(authService).doAuthorization(any());
         mockMvc.perform(MockMvcRequestBuilders.post("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(player)))
+                        .content(mapper.writeValueAsString(authDTO)))
                 .andExpect(status().isBadRequest());
     }
 }

@@ -3,8 +3,10 @@ package org.davydov.in.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.davydov.model.AuthDTO;
 import org.davydov.model.PlayerDTO;
 import org.davydov.model.ResponseDTO;
+import org.davydov.model.ResponseError;
 import org.davydov.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +32,13 @@ public class AuthController {
      * @return токен
      */
     @PostMapping("/auth")
-    public ResponseEntity<?> auth(@RequestBody @Valid PlayerDTO dto) {
+    public ResponseEntity<?> auth(@RequestBody @Valid AuthDTO dto) {
         try{
             Optional<String> token = authService.doAuthorization(dto);
-            return new ResponseEntity<>(new ResponseDTO(token.orElse("default token")), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseDTO(dto.getIdPlayer(), token.orElse("default token")), HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseError(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

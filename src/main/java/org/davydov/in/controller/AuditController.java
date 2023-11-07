@@ -2,6 +2,7 @@ package org.davydov.in.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.davydov.model.ResponseDTO;
+import org.davydov.model.ResponseError;
 import org.davydov.model.ResponseListDTO;
 import org.davydov.service.AuditService;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class AuditController {
             return new ResponseEntity<>(new ResponseListDTO(listAudit), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseError(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

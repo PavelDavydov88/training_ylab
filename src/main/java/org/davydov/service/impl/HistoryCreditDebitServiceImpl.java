@@ -38,17 +38,22 @@ public class HistoryCreditDebitServiceImpl implements HistoryCreditDebitService 
     /**
      * Метод для получения истории пополнения/снятия средств игроком
      *
-     * @param token токен игрока
+     * @param idPlayer
+     * @param token    токен игрока
      * @return лист операций игрока
      */
     @Audit(success = "operation request history of credit/debit operations")
     @Override
-    public List<String> getListOperationAccount(String token) throws Exception {
+    public List<String> getListOperationAccount(long idPlayer, String token) throws Exception {
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
             throw new Exception("invalid token");
         }
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
+        if (id != idPlayer) {
+            log.info("invalid token");
+            throw new Exception("invalid token");
+        }
         try {
             return historyCreditDebitRepository.findById(id);
         } catch (SQLException e) {

@@ -32,17 +32,23 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод возвращает значение счета игрока
      *
-     * @param token - токен игрока
+     * @param idPlayer
+     * @param token    - токен игрока
      * @return значение счета игрока
      */
     @Audit(success = "getting account")
     @Override
-    public long getAccount(String token) throws SQLException {
+    public long getAccount(long idPlayer, String token) throws SQLException {
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
             throw new RuntimeException("invalid token");
         }
+
         int id = Integer.parseInt(authService.decodeJWT(token).getId());
+        if (id != idPlayer) {
+            log.info("invalid token");
+            throw new RuntimeException("invalid token");
+        }
         Player player = null;
         try {
             player = playerRepository.findById(id);
@@ -55,15 +61,15 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод для выполнения операции debit
      *
-     * @param token токен игрока
      * @param dto   DTO операции игрока
+     * @param token токен игрока
      * @return возращает счет игрока
      * @throws Exception в случае значение списания больше значения счета,
      *                   или невалидной транзакции
      */
     @Audit(success = "debit operation completed")
     @Override
-    public long debitAccount(String token, AccountOperationDTO dto) throws Exception {
+    public long debitAccount(AccountOperationDTO dto, String token) throws Exception {
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
             throw new Exception("invalid token");
@@ -89,14 +95,14 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод для выполнения операции credit
      *
-     * @param token токен игрока
      * @param dto   DTO операции игрока
+     * @param token токен игрока
      * @return возращает счета игрока
      * @throws Exception в случае невалидной транзакции
      */
     @Audit(success = "credit operation completed")
     @Override
-    public long creditAccount(String token, AccountOperationDTO dto) throws Exception {
+    public long creditAccount(AccountOperationDTO dto, String token) throws Exception {
 
         if (authService.find(token).isEmpty()) {
             log.info("invalid token");
@@ -124,10 +130,11 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Audit(success = "registration completed successful")
     @Override
-    public void create(PlayerDTO dto) throws SQLException {
+    public long create(PlayerDTO dto) throws SQLException {
         try {
             Player playerInput = PlayerMapper.INSTANCE.toModel(dto);
             playerRepository.save(playerInput);
+            return (playerRepository.findByNamePassword(dto).getId());
         } catch (SQLException e) {
             throw new SQLException(e);
         }

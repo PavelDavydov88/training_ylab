@@ -2,14 +2,15 @@ package org.davydov.service;
 
 import lombok.SneakyThrows;
 import org.davydov.model.AccountOperationDTO;
+import org.davydov.model.AuthDTO;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
+import org.davydov.repository.AuthRepository;
+import org.davydov.repository.PlayerRepository;
 import org.davydov.service.impl.AuthServiceImpl;
 import org.davydov.service.impl.PlayerServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.davydov.repository.AuthRepository;
-import org.davydov.repository.PlayerRepository;
 
 import java.util.Optional;
 
@@ -39,8 +40,8 @@ public class PlayerServiceImplTest {
         when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
         when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
-        Optional<String> token = authService.doAuthorization(new PlayerDTO("Pavel", "password"));
-        long account = playerService.getAccount(token.get());
+        Optional<String> token = authService.doAuthorization(new AuthDTO("Pavel", "password", 1L));
+        long account = playerService.getAccount(1L, token.get());
         assertEquals(0, account);
     }
 
@@ -50,8 +51,8 @@ public class PlayerServiceImplTest {
         when(authRepository.find(anyString())).thenReturn(Optional.of("1"));
         when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
-        Optional<String> token = authService.doAuthorization(new PlayerDTO("Pavel", "password"));
-        assertThrows(Exception.class, () -> playerService.debitAccount(token.get(), new AccountOperationDTO(1L, 100L)));
+        Optional<String> token = authService.doAuthorization(new AuthDTO("Pavel", "password", 1));
+        assertThrows(Exception.class, () -> playerService.debitAccount(new AccountOperationDTO(1L,100L, 16L), token.get()));
     }
 
     @SneakyThrows
@@ -61,8 +62,8 @@ public class PlayerServiceImplTest {
         when(playerRepository.findByNamePassword(new PlayerDTO("Pavel", "password"))).thenReturn(createDefaultPlayer());
         when(playerRepository.update(any(Player.class))).thenReturn(createDefaultPlayer());
         when(playerRepository.findById(1)).thenReturn(createDefaultPlayer());
-        Optional<String> token = authService.doAuthorization(new PlayerDTO("Pavel", "password"));
-        Assertions.assertThrows(Exception.class, () -> playerService.debitAccount(token.get(), createDefaultOperationDTO()));
+        Optional<String> token = authService.doAuthorization(new AuthDTO("Pavel", "password", 1L));
+        Assertions.assertThrows(Exception.class, () -> playerService.debitAccount(createDefaultOperationDTO(), token.get()));
     }
 
     Player createDefaultPlayer() {
@@ -70,6 +71,6 @@ public class PlayerServiceImplTest {
     }
 
     AccountOperationDTO createDefaultOperationDTO() {
-        return new AccountOperationDTO(1L, 1L);
+        return new AccountOperationDTO(1L, 1L, 1L);
     }
 }

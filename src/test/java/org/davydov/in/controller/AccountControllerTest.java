@@ -1,9 +1,11 @@
 package org.davydov.in.controller;
 
 import com.jayway.jsonpath.JsonPath;
+import org.davydov.model.IdPlayerDTO;
 import org.davydov.service.PlayerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -31,15 +33,17 @@ class AccountControllerTest {
     @Test
     void thatGetAccount() throws Exception {
         String token = "test";
-        doReturn(100L).when(playerService).getAccount(anyString());
+        doReturn(100L).when(playerService).getAccount(anyLong(), anyString());
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/account")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(new IdPlayerDTO(1L)))
                         .header("token", token))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String responseAccount = JsonPath.read(result.getResponse().getContentAsString(), "$.response");
-        assertEquals("100", responseAccount);
-        verify(playerService).getAccount(token);
+        Integer responseAccount = JsonPath.read(result.getResponse().getContentAsString(), "$.account");
+        assertEquals(100, responseAccount);
+        verify(playerService).getAccount(1L, token);
     }
 
     @Test

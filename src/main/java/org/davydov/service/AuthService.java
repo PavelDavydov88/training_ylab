@@ -1,13 +1,14 @@
 package org.davydov.service;
 
 import io.jsonwebtoken.Claims;
+import org.davydov.model.AuthDTO;
 import org.davydov.model.PlayerDTO;
 
 import java.sql.SQLException;
 import java.util.Optional;
 
 public interface AuthService {
-    Optional<String> doAuthorization(PlayerDTO dto) throws SQLException;
+    Optional<String> doAuthorization(AuthDTO dto) throws SQLException;
 
     void exitAuthorization(String token) throws SQLException;
 

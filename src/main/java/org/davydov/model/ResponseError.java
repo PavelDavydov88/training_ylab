@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Клас DTO для ответа request
+ * Клас DTO для BAD_REQUEST
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseDTO {
-    private Long idPlayer;
-    private String token;
+public class ResponseError {
+    private String response;
 }

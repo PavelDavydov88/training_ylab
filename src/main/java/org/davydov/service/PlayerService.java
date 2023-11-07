@@ -7,12 +7,12 @@ import java.sql.SQLException;
 
 public interface PlayerService {
 
-    long getAccount(String token) throws SQLException;
+    long getAccount(long idPlayer, String token) throws SQLException;
 
-    long debitAccount(String token, AccountOperationDTO dto) throws Exception;
+    long debitAccount(AccountOperationDTO dto, String token) throws Exception;
 
-    long creditAccount(String token, AccountOperationDTO dto) throws Exception;
+    long creditAccount(AccountOperationDTO dto, String token) throws Exception;
 
-    void create(PlayerDTO dto) throws SQLException;
+    long create(PlayerDTO dto) throws SQLException;
 
 }

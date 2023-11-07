@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.davydov.aop.annotations.Audit;
+import org.davydov.model.AuthDTO;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
 import org.davydov.repository.AuthRepository;
@@ -39,10 +40,14 @@ public class AuthServiceImpl implements AuthService {
      */
     @Audit(success = "authorization completed successful")
     @Override
-    public Optional<String> doAuthorization(PlayerDTO dto) throws SQLException {
+    public Optional<String> doAuthorization(AuthDTO dto) throws SQLException {
         Player player = null;
+        PlayerDTO playerDTO = new PlayerDTO(dto.getName(), dto.getPassword());
         try {
-            player = playerRepository.findByNamePassword(dto);
+            player = playerRepository.findByNamePassword(playerDTO);
+            if (player.getId() != dto.getIdPlayer()) {
+                throw new SQLException("the ID is not equal to");
+            }
         } catch (SQLException e) {
             throw new SQLException(e.getMessage());
         }
