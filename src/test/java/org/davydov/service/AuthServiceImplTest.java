@@ -2,10 +2,10 @@ package org.davydov.service;
 
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
-import org.davydov.service.impl.AuthServiceImpl;
-import org.junit.jupiter.api.Test;
 import org.davydov.repository.AuthRepository;
 import org.davydov.repository.PlayerRepository;
+import org.davydov.service.impl.AuthServiceImpl;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.Optional;

@@ -11,9 +11,7 @@ import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,37 +20,18 @@ import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Testcontainers
-public class PlayerRepositoryImplTest {
+public class PlayerRepositoryImplTest extends RepositoryLiquibaseInit{
 
-    @Container
-    public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
-
+    @Autowired
     PlayerRepository playerRepository;
     public static final String INSERT_PLAYER = """
             INSERT INTO wallet."player" ("id", user_name, password, account)
-            VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)""";
+            VALUES (nextval( 'wallet.sequence_player'), 'Pavel', '123', 0)
+            """;
 
     @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
-        DBConnectionProvider dbConnectionProvider = new DBConnectionProvider();
-        dbConnectionProvider.setUsername(postgresContainer.getUsername());
-        dbConnectionProvider.setPassword(postgresContainer.getPassword());
-        dbConnectionProvider.setUrl(postgresContainer.getJdbcUrl());
-        playerRepository = new PlayerRepositoryImpl(dbConnectionProvider);
-        Connection connection = DriverManager
-                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
-        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-        String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(sql);
-        database.setDefaultSchemaName("liquibase");
-        Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
-        liquibase.update();
-
-        connection = DriverManager
-                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
-        statement = connection.createStatement();
+        super.setUp();
         statement.executeUpdate(INSERT_PLAYER);
     }
 

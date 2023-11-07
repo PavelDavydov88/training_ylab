@@ -1,8 +1,8 @@
 package org.davydov.service;
 
+import org.davydov.repository.TransactionRepository;
 import org.davydov.service.impl.TransactionServiceImpl;
 import org.junit.jupiter.api.Test;
-import org.davydov.repository.TransactionRepository;
 
 import java.sql.SQLException;
 

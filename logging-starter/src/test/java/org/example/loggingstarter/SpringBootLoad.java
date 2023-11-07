@@ -1,14 +1,12 @@
-package org.davydov;
+package org.example.loggingstarter;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TrainingYlabBootApplication {
+public class SpringBootLoad {
 
     public static void main(String[] args) {
-
-        SpringApplication.run(TrainingYlabBootApplication.class, args);
+        SpringApplication.run(SpringBootLoad.class, args);
     }
-
 }

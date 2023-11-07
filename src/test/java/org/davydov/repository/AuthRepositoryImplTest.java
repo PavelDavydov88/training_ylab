@@ -7,11 +7,10 @@ import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import org.davydov.config.DBConnectionProvider;
+import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,34 +21,17 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Testcontainers
-public class AuthRepositoryImplTest {
-    @Container
-    public PostgreSQLContainer postgresContainer = new PostgreSQLContainer();
+public class AuthRepositoryImplTest extends RepositoryLiquibaseInit {
 
+    @Autowired
     AuthRepository authRepository;
-    public static final String INSERT_TOKEN = """
-            INSERT INTO wallet."auth" ("id" ,"token") VALUES (nextval( 'wallet.sequence_auth'), '1')""";
+    private static final String INSERT_TOKEN = """
+            INSERT INTO wallet."auth" ("id" ,"token") VALUES (nextval( 'wallet.sequence_auth'), '1')
+            """;
 
     @BeforeEach
     public void setUp() throws SQLException, LiquibaseException {
-        DBConnectionProvider dbConnectionProvider = new DBConnectionProvider();
-        dbConnectionProvider.setUsername(postgresContainer.getUsername());
-        dbConnectionProvider.setPassword(postgresContainer.getPassword());
-        dbConnectionProvider.setUrl(postgresContainer.getJdbcUrl());
-        authRepository = new AuthRepositoryImpl(dbConnectionProvider);
-        Connection connection = DriverManager
-                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
-        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-        String sql = "CREATE SCHEMA IF NOT EXISTS liquibase";
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(sql);
-        database.setDefaultSchemaName("liquibase");
-        Liquibase liquibase = new Liquibase("db/changelog/changelog.xml", new ClassLoaderResourceAccessor(), database);
-        liquibase.update();
-        connection = DriverManager
-                .getConnection(postgresContainer.getJdbcUrl(), postgresContainer.getUsername(), postgresContainer.getPassword());
-        statement = connection.createStatement();
+        super.setUp();
         statement.executeUpdate(INSERT_TOKEN);
     }
 
