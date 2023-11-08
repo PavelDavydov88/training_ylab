@@ -2,7 +2,6 @@ package org.example.auditstarter.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
@@ -12,7 +11,6 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-@ConditionalOnMissingBean(AuditRepository.class)
 public class AuditRepositoryImplStarter implements AuditRepository {
 
     private final Map<Long, List<String>> map = new HashMap<>();

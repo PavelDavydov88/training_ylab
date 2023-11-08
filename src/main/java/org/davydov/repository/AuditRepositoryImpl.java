@@ -3,6 +3,7 @@ package org.davydov.repository;
 import lombok.RequiredArgsConstructor;
 import org.davydov.config.DBConnectionProvider;
 import org.example.auditstarter.repository.AuditRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * DAO for Audit operations
  */
+@Primary
 @Repository
 @RequiredArgsConstructor
 public class AuditRepositoryImpl implements AuditRepository {
