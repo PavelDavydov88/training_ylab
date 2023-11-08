@@ -35,7 +35,7 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод возвращает значение счета игрока
      *
-     * @param idPlayer
+     * @param idPlayer ID игрока
      * @param token    - токен игрока
      * @return значение счета игрока
      */
@@ -64,7 +64,7 @@ public class PlayerServiceImpl implements PlayerService {
     /**
      * Метод для выполнения операции debit
      *
-     * @param idPlayer
+     * @param idPlayer ID игрока
      * @param dto      DTO операции игрока
      * @param token    токен игрока
      * @return возращает счет игрока

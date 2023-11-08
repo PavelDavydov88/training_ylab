@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Класс обработки ошибки при валидации данных в контроллерах
+ */
 @ControllerAdvice
 public class ControllerExceptionHandler {
 

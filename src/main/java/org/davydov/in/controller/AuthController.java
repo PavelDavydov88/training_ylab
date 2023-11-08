@@ -26,7 +26,8 @@ public class AuthController {
     /**
      * Метод для предоставления auth
      *
-     * @param dto DTO игрока
+     * @param idPlayer DI игрока
+     * @param dto      DTO игрока
      * @return токен
      */
     @PostMapping("/auth/{idPlayer}")

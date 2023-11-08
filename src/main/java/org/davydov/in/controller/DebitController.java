@@ -22,6 +22,7 @@ public class DebitController {
     /**
      * Метод для выполнения дебита игрока
      *
+     * @param idPlayer ID игрока
      * @param headers заголовок с токеном
      * @param dto     DTO операции со счетом
      * @return счет игрока

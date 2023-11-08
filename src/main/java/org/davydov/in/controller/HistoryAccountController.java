@@ -27,7 +27,8 @@ HistoryAccountController {
     /**
      * Метод для предоставления истории действий со счетом игрока
      *
-     * @param headers заголовок с токеном
+     * @param idPlayer ID игрока
+     * @param headers  заголовок с токеном
      * @return лист истории действий со счетом игрока
      */
     @PostMapping("/history/{idPlayer}")

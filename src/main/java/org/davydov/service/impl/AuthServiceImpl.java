@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Метод авторизации игрока
      *
-     * @param idPlayer
+     * @param idPlayer ID игрока
      * @param dto      DTO игрока
      * @return возращает токен опционально
      * @throws SQLException

@@ -22,8 +22,9 @@ public class CreditController {
     /**
      * Метод для выполнения кредита игрока
      *
-     * @param headers заголовок с токеном
-     * @param dto     DTO операции со счетом
+     * @param idPlayer ID игрока
+     * @param headers  заголовок с токеном
+     * @param dto      DTO операции со счетом
      * @return счет игрока
      */
     @PostMapping("/credit/{idPlayer}")

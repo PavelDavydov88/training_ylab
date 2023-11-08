@@ -24,7 +24,8 @@ public class AccountController {
     /**
      * Метод для предоставления счета игрока
      *
-     * @param headers заголовок с токеном
+     * @param idPlayer ID игрока
+     * @param headers  заголовок с токеном
      * @return значение счета
      */
     @PostMapping("/account/{idPlayer}")

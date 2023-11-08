@@ -1,7 +1,8 @@
-package org.davydov.repository;
+package org.davydov.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.davydov.config.DBConnectionProvider;
+import org.davydov.repository.TransactionRepository;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;

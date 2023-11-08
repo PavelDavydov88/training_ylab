@@ -4,6 +4,9 @@ import org.example.loggingstarter.EnableLoggable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Класс старта приложения
+ */
 @EnableLoggable
 @SpringBootApplication
 public class TrainingYlabBootApplication {

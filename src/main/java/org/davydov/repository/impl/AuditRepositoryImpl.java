@@ -1,7 +1,9 @@
-package org.davydov.repository;
+package org.davydov.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.davydov.config.DBConnectionProvider;
+import org.example.auditstarter.repository.AuditRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -13,30 +15,32 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * DAO for History debit/credit
+ * DAO for Audit operations
  */
+@Primary
 @Repository
 @RequiredArgsConstructor
-public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
+public class AuditRepositoryImpl implements AuditRepository {
 
     private final DBConnectionProvider dbConnectionProvider;
-    private static final String INSERT_HISTORY = """
-            INSERT INTO wallet."history-credit-debit" ("id", "id_player", "operation") VALUES (nextval( 'wallet.sequence_history'), ?, ?)""";
-    private static final String SELECT_FIND_HISTORY = """
-            select * from wallet."history-credit-debit" where "id_player" = ?""";
+    private static final String INSERT_AUDIT = """
+            INSERT INTO wallet."audit" ("id", "id_player", "operation") 
+            VALUES (nextval( 'wallet.sequence_audit'), ?, ?)""";
+    private static final String SELECT_FIND_AUDIT = """
+            select * from wallet."audit" where "id_player" = ?""";
 
     /**
-     * Метод сохраняет историю дебит/кредит игрока
+     * Метод сохраняет действия игрока
      *
      * @param idPlayer    ID игрока
-     * @param historyText история дебит/кредит игрока
+     * @param historyText действие игрока
      * @throws SQLException
      */
     @Override
     public void save(long idPlayer, String historyText) throws SQLException {
         String historyWithDate = historyText + ", time = " + new Date();
         try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_HISTORY)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_AUDIT)) {
             preparedStatement.setLong(1, idPlayer);
             preparedStatement.setString(2, historyWithDate);
             preparedStatement.executeUpdate();
@@ -46,17 +50,17 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
     }
 
     /**
-     * Метод возвращает истории дебит/кредит игрока
+     * Метод возвращает все действия игрока
      *
      * @param id ID игрока
-     * @return список истории дебит/кредит игрока
+     * @return список действий игрока
      * @throws SQLException
      */
     @Override
-    public List<String> findById(long id) throws SQLException {
+    public List<String> findAllById(long id) throws Exception {
         List<String> listHistory = new ArrayList<>();
         try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FIND_HISTORY);) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FIND_AUDIT)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -66,7 +70,7 @@ public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepos
             }
             return listHistory;
         } catch (SQLException e) {
-            throw new SQLException(e.getMessage());
+            throw new Exception(e.getMessage());
         }
     }
 }

@@ -1,9 +1,8 @@
-package org.davydov.repository;
+package org.davydov.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.davydov.config.DBConnectionProvider;
-import org.example.auditstarter.repository.AuditRepository;
-import org.springframework.context.annotation.Primary;
+import org.davydov.repository.HistoryCreditDebitRepository;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -15,32 +14,30 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * DAO for Audit operations
+ * DAO for History debit/credit
  */
-@Primary
 @Repository
 @RequiredArgsConstructor
-public class AuditRepositoryImpl implements AuditRepository {
+public class HistoryCreditDebitRepositoryImpl implements HistoryCreditDebitRepository {
 
     private final DBConnectionProvider dbConnectionProvider;
-    private static final String INSERT_AUDIT = """
-            INSERT INTO wallet."audit" ("id", "id_player", "operation") 
-            VALUES (nextval( 'wallet.sequence_audit'), ?, ?)""";
-    private static final String SELECT_FIND_AUDIT = """
-            select * from wallet."audit" where "id_player" = ?""";
+    private static final String INSERT_HISTORY = """
+            INSERT INTO wallet."history-credit-debit" ("id", "id_player", "operation") VALUES (nextval( 'wallet.sequence_history'), ?, ?)""";
+    private static final String SELECT_FIND_HISTORY = """
+            select * from wallet."history-credit-debit" where "id_player" = ?""";
 
     /**
-     * Метод сохраняет действия игрока
+     * Метод сохраняет историю дебит/кредит игрока
      *
      * @param idPlayer    ID игрока
-     * @param historyText действие игрока
+     * @param historyText история дебит/кредит игрока
      * @throws SQLException
      */
     @Override
     public void save(long idPlayer, String historyText) throws SQLException {
         String historyWithDate = historyText + ", time = " + new Date();
         try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_AUDIT)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_HISTORY)) {
             preparedStatement.setLong(1, idPlayer);
             preparedStatement.setString(2, historyWithDate);
             preparedStatement.executeUpdate();
@@ -50,17 +47,17 @@ public class AuditRepositoryImpl implements AuditRepository {
     }
 
     /**
-     * Метод возвращает все действия игрока
+     * Метод возвращает истории дебит/кредит игрока
      *
      * @param id ID игрока
-     * @return список действий игрока
+     * @return список истории дебит/кредит игрока
      * @throws SQLException
      */
     @Override
-    public List<String> findAllById(long id) throws Exception {
+    public List<String> findById(long id) throws SQLException {
         List<String> listHistory = new ArrayList<>();
         try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FIND_AUDIT)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FIND_HISTORY);) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -70,7 +67,7 @@ public class AuditRepositoryImpl implements AuditRepository {
             }
             return listHistory;
         } catch (SQLException e) {
-            throw new Exception(e.getMessage());
+            throw new SQLException(e.getMessage());
         }
     }
 }

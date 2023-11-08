@@ -26,7 +26,8 @@ public class AuditController {
     /**
      * Метод для предоставления аудита игрока
      *
-     * @param headers заголовок с токеном
+     * @param idPlayer ID игрока
+     * @param headers  заголовок с токеном
      * @return лист аудита игрока
      */
     @PostMapping("/audit/{idPlayer}")
