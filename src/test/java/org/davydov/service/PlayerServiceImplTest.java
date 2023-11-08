@@ -4,12 +4,13 @@ import lombok.SneakyThrows;
 import org.davydov.model.AccountOperationDTO;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
-import org.davydov.repository.AuditRepository;
 import org.davydov.repository.AuthRepository;
 import org.davydov.repository.PlayerRepository;
-import org.davydov.service.impl.AuditServiceImpl;
 import org.davydov.service.impl.AuthServiceImpl;
 import org.davydov.service.impl.PlayerServiceImpl;
+import org.example.auditstarter.repository.AuditRepository;
+import org.example.auditstarter.service.AuditService;
+import org.example.auditstarter.service.impl.AuditServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

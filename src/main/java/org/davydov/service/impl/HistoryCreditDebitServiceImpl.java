@@ -2,10 +2,10 @@ package org.davydov.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.davydov.aop.annotations.Audit;
 import org.davydov.repository.HistoryCreditDebitRepository;
 import org.davydov.service.AuthService;
 import org.davydov.service.HistoryCreditDebitService;
+import org.example.auditstarter.aop.annotations.Audit;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;

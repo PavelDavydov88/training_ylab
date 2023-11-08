@@ -2,13 +2,14 @@ package org.davydov.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.davydov.aop.annotations.Audit;
 import org.davydov.model.AccountOperationDTO;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
 import org.davydov.model.mapper.PlayerMapper;
 import org.davydov.repository.PlayerRepository;
 import org.davydov.service.*;
+import org.example.auditstarter.aop.annotations.Audit;
+import org.example.auditstarter.service.AuditService;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;

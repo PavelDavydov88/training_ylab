@@ -5,12 +5,12 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
-import org.davydov.aop.annotations.Audit;
 import org.davydov.model.Player;
 import org.davydov.model.PlayerDTO;
 import org.davydov.repository.AuthRepository;
 import org.davydov.repository.PlayerRepository;
 import org.davydov.service.AuthService;
+import org.example.auditstarter.aop.annotations.Audit;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;

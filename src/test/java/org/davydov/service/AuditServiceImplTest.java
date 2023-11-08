@@ -1,7 +1,8 @@
 package org.davydov.service;
 
-import org.davydov.repository.AuditRepository;
-import org.davydov.service.impl.AuditServiceImpl;
+import org.example.auditstarter.repository.AuditRepository;
+import org.example.auditstarter.service.AuditService;
+import org.example.auditstarter.service.impl.AuditServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;

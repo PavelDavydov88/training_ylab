@@ -1,8 +1,8 @@
 package org.davydov.repository;
 
-
 import lombok.RequiredArgsConstructor;
 import org.davydov.config.DBConnectionProvider;
+import org.example.auditstarter.repository.AuditRepository;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;

@@ -12,5 +12,4 @@ public class TrainingYlabBootApplication {
 
         SpringApplication.run(TrainingYlabBootApplication.class, args);
     }
-
 }
