@@ -4,15 +4,18 @@ import org.davydov.model.AccountOperationDTO;
 import org.davydov.model.PlayerDTO;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public interface PlayerService {
 
-    long getAccount(String token) throws SQLException;
+    long getAccount(long idPlayer, String token) throws SQLException;
 
-    long debitAccount(String token, AccountOperationDTO dto) throws Exception;
+    long debitAccount(long idPlayer, AccountOperationDTO dto, String token) throws Exception;
 
-    long creditAccount(String token, AccountOperationDTO dto) throws Exception;
+    long creditAccount(long idPlayer, AccountOperationDTO dto, String token) throws Exception;
 
-    void create(PlayerDTO dto) throws SQLException;
+    long create(PlayerDTO dto) throws SQLException;
+
+    List<String> getListAuditAction(long idPlayer, String token) throws SQLException, Exception;
 
 }

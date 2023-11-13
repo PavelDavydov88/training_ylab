@@ -1,12 +1,13 @@
 package org.davydov.in.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.davydov.model.PlayerDTO;
 import org.davydov.model.ResponseDTO;
 import org.davydov.service.AuthService;
-import org.davydov.utils.ValidationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,15 +26,14 @@ public class AuthController {
     /**
      * Метод для предоставления auth
      *
-     * @param dto DTO игрока
+     * @param idPlayer DI игрока
+     * @param dto      DTO игрока
      * @return токен
      */
-    @PostMapping("/auth")
-    public ResponseEntity<?> auth(@RequestBody PlayerDTO dto) {
+    @PostMapping("/auth/{idPlayer}")
+    public ResponseEntity<?> auth(@PathVariable Long idPlayer, @RequestBody @Valid PlayerDTO dto) {
         try {
-            ValidationUtils.isEmptyOrNull(dto.getName());
-            ValidationUtils.size(2, 10, dto.getName());
-            Optional<String> token = authService.doAuthorization(dto);
+            Optional<String> token = authService.doAuthorization(idPlayer, dto);
             return new ResponseEntity<>(new ResponseDTO(token.orElse("default token")), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

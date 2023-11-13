@@ -5,7 +5,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
 
     <changeSet id="006-create-table-auth" author="pavel">
-        <createSequence sequenceName="SEQUENCE_AUTH" incrementBy="1" cacheSize="1" maxValue="9223372036854775807" startValue="50" schemaName="wallet"/>
+        <createSequence sequenceName="SEQUENCE_AUTH" incrementBy="1" cacheSize="1" maxValue="9223372036854775807"
+                        startValue="50" schemaName="wallet"/>
         <createTable tableName="auth" schemaName="wallet">
             <column name="id" type="BIGINT" remarks="ID auth" defaultValueComputed="nextval('wallet.SEQUENCE_AUTH')">
                 <constraints primaryKey="true" nullable="false" unique="true"/>

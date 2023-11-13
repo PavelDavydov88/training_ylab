@@ -5,9 +5,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
 
     <changeSet id="005-create-table-transaction" author="pavel">
-        <createSequence sequenceName="SEQUENCE_TRANSACTION" incrementBy="1" cacheSize="1" maxValue="9223372036854775807" startValue="40" schemaName="wallet"/>
+        <createSequence sequenceName="SEQUENCE_TRANSACTION" incrementBy="1" cacheSize="1" maxValue="9223372036854775807"
+                        startValue="40" schemaName="wallet"/>
         <createTable tableName="transaction" schemaName="wallet">
-            <column name="id" type="BIGINT" remarks="ID транзакции" defaultValueComputed="nextval('wallet.SEQUENCE_TRANSACTION')">
+            <column name="id" type="BIGINT" remarks="ID транзакции"
+                    defaultValueComputed="nextval('wallet.SEQUENCE_TRANSACTION')">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
             <column name="id_player" type="BIGINT" remarks="ID игрока">

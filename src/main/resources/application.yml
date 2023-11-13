@@ -1,7 +1,3 @@
-spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
 db.url: jdbc:postgresql://localhost:15432/ylabuser
 db.user: ylabuser
 db.password: 1234

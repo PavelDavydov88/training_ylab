@@ -6,10 +6,7 @@ import org.davydov.model.ResponseDTO;
 import org.davydov.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -25,19 +22,20 @@ public class CreditController {
     /**
      * Метод для выполнения кредита игрока
      *
-     * @param headers заголовок с токеном
-     * @param dto     DTO операции со счетом
+     * @param idPlayer ID игрока
+     * @param headers  заголовок с токеном
+     * @param dto      DTO операции со счетом
      * @return счет игрока
      */
-    @PostMapping("/credit")
-    public ResponseEntity<?> credit(@RequestHeader Map<String, String> headers, @RequestBody AccountOperationDTO dto) {
+    @PostMapping("/credit/{idPlayer}")
+    public ResponseEntity<?> credit(@PathVariable Long idPlayer, @RequestBody AccountOperationDTO dto, @RequestHeader Map<String, String> headers) {
         String token = headers.get("token");
         try {
             if (token == null) {
                 throw new RuntimeException("token is null");
             }
-            Long accountPlayer = playerService.creditAccount(token, dto);
-            return new ResponseEntity<>(new ResponseDTO(accountPlayer.toString()), HttpStatus.OK);
+            Long accountPlayer = playerService.creditAccount(idPlayer, dto, token);
+            return new ResponseEntity<>(new ResponseDTO(String.valueOf(accountPlayer)), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);

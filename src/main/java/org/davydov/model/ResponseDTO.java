@@ -5,11 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Клас DTO для ответа request JSON(String : String)
+ * Клас DTO для ответа request
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ResponseDTO {
     private String response;
 }

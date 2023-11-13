@@ -31,20 +31,20 @@ class AccountControllerTest {
     @Test
     void thatGetAccount() throws Exception {
         String token = "test";
-        doReturn(100L).when(playerService).getAccount(anyString());
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/account")
+        doReturn(100L).when(playerService).getAccount(anyLong(), anyString());
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/account/1")
                         .header("token", token))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String responseAccount = JsonPath.read(result.getResponse().getContentAsString(), "$.response");
         assertEquals("100", responseAccount);
-        verify(playerService).getAccount(token);
+        verify(playerService).getAccount(1L, token);
     }
 
     @Test
     void thatGetAccountFailure() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/account")
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/1")
                         .header("not a token", ""))
                 .andExpect(status().isBadRequest());
     }

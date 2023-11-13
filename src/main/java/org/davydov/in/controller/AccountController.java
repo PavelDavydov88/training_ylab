@@ -5,6 +5,7 @@ import org.davydov.model.ResponseDTO;
 import org.davydov.service.PlayerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,18 +24,19 @@ public class AccountController {
     /**
      * Метод для предоставления счета игрока
      *
-     * @param headers заголовок с токеном
+     * @param idPlayer ID игрока
+     * @param headers  заголовок с токеном
      * @return значение счета
      */
-    @PostMapping("/account")
-    public ResponseEntity<?> account(@RequestHeader Map<String, String> headers) {
+    @PostMapping("/account/{idPlayer}")
+    public ResponseEntity<?> account(@PathVariable Long idPlayer, @RequestHeader Map<String, String> headers) {
         String token = headers.get("token");
         try {
             if (token == null) {
                 throw new RuntimeException("token is null");
             }
-            Long accountPlayer = playerService.getAccount(token);
-            return new ResponseEntity<>(new ResponseDTO(accountPlayer.toString()), HttpStatus.OK);
+            Long accountPlayer = playerService.getAccount(idPlayer, token);
+            return new ResponseEntity<>(new ResponseDTO(String.valueOf(accountPlayer)), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(new ResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
